@@ -22,7 +22,7 @@ python -m pip install -U pip #just to update
 ```
 **Note**: Do not push the 4010Project environment folder to GitHub.
 
-2. Install Requirements
+2. Install Requirements in project directory
 ```(shell)
 pip install -r requirements.txt
 pip install -e .
