@@ -9,6 +9,7 @@ from gymnasium.utils.env_checker import check_env
 import v0_thin_ice as ti
 import numpy as np
 
+#Register -> to be able to use it as ID
 register(
     id='thin-ice-v0', # unique id for the environment
     entry_point='gymnasium_env.envs:ThinIceEnv', # module_name:class_name
@@ -25,7 +26,7 @@ class ThinIceEnv(gym.Env):
         self.player = ti.ThinIcePlayer(self.level)
 
         # Define action and observation space
-        self.action_space = spaces.Discrete(len(ti.PlayerActions))
+        self.action_space = spaces.Discrete(len(ti.PlayerActions))  #randomly select an action
         self.observation_space = spaces.Box(
             low=0, 
             high= np.array([self.level.get_num_rows()-1, self.level.get_num_cols()-1, self.level.get_num_rows()-1, self.level.get_num_cols()-1]),
@@ -63,7 +64,7 @@ class ThinIceEnv(gym.Env):
             print(f"Action taken: {ti.PlayerActions(action)}")
             self.player.render()
         
-        # Return observation, reward, done, truncated (not used), info
+        # Return observation, reward, done, truncated (not used [eg: after 200 steps stop]), info
         return obs, reward, terminated, False, info
     
     def render(self):
@@ -73,13 +74,14 @@ class ThinIceEnv(gym.Env):
 if __name__ == "__main__":
     env = gym.make('thin-ice-v0', render_mode='human', path_to_level='Textfiles\Level1.txt')
 
-    print("Check environment begin")
+    print("======================================== Check environment begin ========================================")
     check_env(env, warn=True)
-    print("Check environment end")
+    print("========================================  Check environment end  ========================================")
 
     # Reset the environment
     obs, info = env.reset()
 
+    print("======================================== START ROUND ========================================")
     # Take a random action
     for i in range(10):
         action = env.action_space.sample()
