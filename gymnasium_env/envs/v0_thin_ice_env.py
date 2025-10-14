@@ -51,7 +51,7 @@ class ThinIceEnv(gym.Env):
         try:
             #map letters to images
             map_images = {
-                'P': 'penguin.webp',     
+                'P': 'floor_with_player.png',     
                 'W': 'wall.webp',      
                 'T': 'target.webp',        
                 'F': 'floor.webp',  
@@ -143,7 +143,7 @@ class ThinIceEnv(gym.Env):
         self.window.blit(surface, (0, 0))
         #make sure the display is visible
         pygame.display.flip()
-        self.clock.tick(4) #1 literally doesnt wotk?
+        self.clock.tick(4) #FPS using 4 instead of 1 to make it faster
 
 
 # Run to test the environment
