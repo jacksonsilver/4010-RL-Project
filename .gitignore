@@ -173,4 +173,7 @@ poetry.toml
 # LSP config files
 pyrightconfig.json
 
+#Local virtual environment
+4010Project/
+
 # End of https://www.toptal.com/developers/gitignore/api/python
