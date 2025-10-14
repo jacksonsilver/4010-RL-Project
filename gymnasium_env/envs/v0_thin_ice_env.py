@@ -51,7 +51,8 @@ class ThinIceEnv(gym.Env):
         try:
             #map letters to images
             map_images = {
-                'P': 'floor_with_player.png',     
+                'PF': 'floor_with_player.png',
+                'PT': 'target_with_player.png',     
                 'W': 'wall.webp',      
                 'T': 'target.webp',        
                 'F': 'floor.webp',  
@@ -136,8 +137,10 @@ class ThinIceEnv(gym.Env):
         px = player_x * self.cell_size
         py = player_y * self.cell_size
         
-        if 'P' in self.tile_images:
-            surface.blit(self.tile_images['P'], (px, py))
+        if self.level.get_tile(self.player.player_pos).tile_type == ti.LevelTileType.TARGET:
+            surface.blit(self.tile_images['PT'], (px, py))
+        else:  
+            surface.blit(self.tile_images['PF'], (px, py))
        
         # Update display(copy surface to window)
         self.window.blit(surface, (0, 0))
