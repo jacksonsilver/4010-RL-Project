@@ -8,11 +8,15 @@
 - Lujain Sharafeldin - 101246804
 
 ### Update 15th October
-- everyone set up the environment
-- Designed the interface from scratch
-- Started with console terminal output, and then adjusted with pygame.
-- Started training model with different levels, to see what happens
+What has been done past two weeks:
+- Everyone set up the environment
+- Designed the interface from scratch along with the assets used (tiles, players, target, walls)
+- Started with console terminal output to display actions taken, transitioned to working on the interface to display assets with pygame
+- Started training model with different levels (mazes) to see if agent is able to learn (currently interface shows agent moving to target successfully after finishing training)
 
+What will be done the next two weeks:
+ 
+  
 ## Installation
 
 To install your new environment, run the following commands:
