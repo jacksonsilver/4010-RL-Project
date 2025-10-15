@@ -1,7 +1,7 @@
 # COMP 4010 - Final Project
 
 ### Team Members: 
-- Jackson Silver
+- Jackson Silver     - 101224148
 - Kinjal Kamboj      - 101227444
 - Alexis Udechukwu   - 101225811
 - Trista Wang        - 
