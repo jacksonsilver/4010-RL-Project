@@ -1,4 +1,5 @@
 from enum import Enum
+import numpy as np
 
 # The actions that the player is capable of doing
 class PlayerActions(Enum):
@@ -6,6 +7,17 @@ class PlayerActions(Enum):
     DOWN = 1
     RIGHT = 2
     UP = 3
+
+    def get_direction(self):
+        match(self):
+            case PlayerActions.LEFT:
+                return np.array([-1, 0])
+            case PlayerActions.RIGHT:
+                return np.array([1, 0])
+            case PlayerActions.UP:
+                return np.array([0, -1])
+            case PlayerActions.DOWN:
+                return np.array([0, 1])
 
 # The different types of tiles that can be in a level
 class LevelTileType(Enum):
@@ -32,7 +44,7 @@ class LevelTileType(Enum):
                 return '?'
 
 class Tile():
-    def __init__(self, tile_type: LevelTileType, position: tuple):
+    def __init__(self, tile_type: LevelTileType, position: np.array):
         self.tile_type = tile_type
         self.position = position
     
@@ -49,21 +61,28 @@ class Level:
             for line in f.readlines():
                 row = [] # An array of tiles
                 for char in line.strip():
-                    if char == 'F':
-                        row.append(Tile(LevelTileType.FLOOR, (len(row), len(self.tiles))))
-                    elif char == 'W':
-                        row.append(Tile(LevelTileType.WALL, (len(row), len(self.tiles))))
-                    elif char == 'T':
-                        self.target = (len(row), len(self.tiles))
-                        row.append(Tile(LevelTileType.TARGET, (len(row), len(self.tiles))))
-                    elif char == '~':
-                        row.append(Tile(LevelTileType.WATER, (len(row), len(self.tiles))))
-                    elif char == 'P':
-                        self.player_start = (len(row), len(self.tiles))
-                        row.append(Tile(LevelTileType.FLOOR, (len(row), len(self.tiles))))
-                    elif char == 'B':
-                        row.append(Tile(LevelTileType.BLANK, (len(row), len(self.tiles))))
+                    tile_position = np.array([len(row), len(self.tiles)])
+                    tile_type: LevelTileType = None
+                    match char:
+                        case 'F':
+                            tile_type = LevelTileType.FLOOR
+                        case 'W':
+                            tile_type = LevelTileType.WALL
+                        case 'T':
+                            tile_type = LevelTileType.TARGET
+                            self.target = tile_position
+                        case '~':
+                            tile_type = LevelTileType.WATER
+                        case 'P':
+                            tile_type = LevelTileType.FLOOR
+                            self.player_start = tile_position
+                        case 'B':
+                            tile_type = LevelTileType.BLANK
+                        case _:
+                            tile_type = None
                     
+                    if tile_type is not None:
+                        row.append(Tile(tile_type, tile_position))
                 self.tiles.append(row)
 
     # Gets the tile at a given position, or None if out of bounds
@@ -102,19 +121,9 @@ class ThinIcePlayer:
         self.target_pos = self.level.target
     
     # Called in step function, returns True if reached target
-    def perform_action(self, action: PlayerActions) -> bool:
-        match(action):
-            case PlayerActions.LEFT:
-                new_pos = (self.player_pos[0] - 1, self.player_pos[1] )
-            case PlayerActions.RIGHT:
-                new_pos = (self.player_pos[0] + 1, self.player_pos[1])
-            case PlayerActions.UP:
-                new_pos = (self.player_pos[0], self.player_pos[1] - 1)
-            case PlayerActions.DOWN:
-                new_pos = (self.player_pos[0], self.player_pos[1] + 1)
-            case _:
-                new_pos = self.player_pos
-        
+    def perform_action(self, action: PlayerActions) -> bool:         
+        new_pos = self.player_pos + action.get_direction()
+
         # Check if the new position is valid
         tile = self.level.get_tile(new_pos)
         if tile is not None and tile.tile_type != LevelTileType.WALL:
@@ -123,7 +132,7 @@ class ThinIcePlayer:
         else:
             print("Invalid move to ", new_pos)
         
-        return self.player_pos == self.target_pos
+        return np.array_equal(self.player_pos, self.target_pos)
 
     def render(self):
         for i in range(self.level.get_num_rows()):
