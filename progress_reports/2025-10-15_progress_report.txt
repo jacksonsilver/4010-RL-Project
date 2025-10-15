@@ -1,0 +1,31 @@
+OCTOBER 15th Progress Report
+
+Progress in Past 2 Weeks:
+
+Alexis
+	- Created text tile representation of Thin Ice levels
+	- Implemented pygame rendering using custom assets
+
+Jackson
+	- Environment setup
+	- Asset creation for pygame rendering
+	- Implemented initial custom thin-ice environment creation with console rendering.
+
+Kinjal
+	- Environment Setup
+
+Lujain
+	- Environment setup
+	- Implemented initial testing of custom environment with graph creation.
+	- Setup README with testing instructions.
+
+Trista
+	- Environment Setup
+
+Main Accomplishment: Agent can navigate through maze and find target in all levels after sufficient training.
+
+Goals for next 2 weeks:
+	- Implement Tile disappearance, with water placement, and ensure agent can still navigate maze.
+	- Implement Goal of stepping on all tiles in level.
+	- Implement new algorithms for achieving goals.
+	- Look into running agent on not seen levels, or combining training data.
