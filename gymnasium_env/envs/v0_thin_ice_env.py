@@ -97,7 +97,6 @@ class ThinIceEnv(gym.Env):
 
         if self.render_mode == "human":
             print(f"Action taken: {ti.PlayerActions(action)}")
-            # self.player.render()
             self.render_pygame() 
         
         # Return observation, reward, done, truncated (not used [eg: after 200 steps stop]), info

@@ -9,11 +9,9 @@ import os
 
 
 ### Using Q-Learning
-
 def train_q_learning(episodes,training = True,render = False): #episodes just means how many times
 
     env = gym.make('thin-ice-v0',render_mode ='human' if render else None)
-
 
     if(training):
         # Table Shape is Number of Cols (X) * Num of Rows (Y) * Number of Actions 
@@ -92,8 +90,6 @@ def train_q_learning(episodes,training = True,render = False): #episodes just me
         f  = open('v0_thin_ice_solution.pk1',"wb")
         pickle.dump(q,f)
         f.close()
-
-
 
 if __name__ == '__main__':
     train_q_learning(500,training=True,render=False) #for testing, keeping 2 as small number
