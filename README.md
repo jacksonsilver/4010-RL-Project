@@ -7,7 +7,11 @@
 - Trista Wang        - 
 - Lujain Sharafeldin - 101246804
 
-
+### Update 15th October
+- everyone set up the environment
+- Designed the interface from scratch
+- Started with console terminal output, and then adjusted with pygame.
+- Started training model with different levels, to see what happens
 
 ## Installation
 
@@ -30,6 +34,8 @@ pip install -e .
 
 ## Running for Testing
 - Run  `gymnasium_env/envs/v0_thin_ice_env.py` 
+- Run  `gymnasium_env/envs/v0_thin_ice_train.py` 
+
 
 
 ##

@@ -20,7 +20,7 @@ register(
 class ThinIceEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 1}
 
-    def __init__(self, render_mode=None, path_to_level='Textfiles\Level1.txt'):
+    def __init__(self, render_mode=None, path_to_level='Textfiles\Level3.txt'):
         self.render_mode = render_mode
 
         # Initialize the level and player
@@ -151,7 +151,7 @@ class ThinIceEnv(gym.Env):
 
 # Run to test the environment
 if __name__ == "__main__":
-    env = gym.make('thin-ice-v0', render_mode='human', path_to_level='Textfiles\Level1.txt')
+    env = gym.make('thin-ice-v0', render_mode='human', path_to_level='Textfiles\Level3.txt')
 
     print("======================================== Check environment begin ========================================")
     check_env(env, warn=True)

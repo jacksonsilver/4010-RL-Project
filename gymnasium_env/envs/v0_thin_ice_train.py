@@ -97,7 +97,7 @@ def train_q_learning(episodes,training = True,render = False): #episodes just me
 
 
 if __name__ == '__main__':
-    train_q_learning(1,training=True,render=False) #for testing, keeping 2 as small number
+    train_q_learning(500,training=True,render=False) #for testing, keeping 2 as small number
     train_q_learning(1,training=False,render=True)  
 
 
