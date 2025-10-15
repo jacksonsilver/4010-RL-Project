@@ -16,10 +16,9 @@ def train_q_learning(episodes,training = True,render = False): #episodes just me
 
 
     if(training):
-        q = np.zeros((env.unwrapped.level.get_num_rows(),
-              env.unwrapped.level.get_num_cols(),
+        # Table Shape is Number of Cols (X) * Num of Rows (Y) * Number of Actions 
+        q = np.zeros((env.unwrapped.level.get_num_cols(),
               env.unwrapped.level.get_num_rows(),
-              env.unwrapped.level.get_num_cols(),
               env.action_space.n))
     else:
         #done training, want the results
@@ -38,7 +37,7 @@ def train_q_learning(episodes,training = True,render = False): #episodes just me
     step_count = 0
     for i in range(episodes):
         if(render):
-            print(f'Epsiode: {i}')
+            print(f'Episode: {i}')
 
         #Reset env before each episode
         state = env.reset()[0]
@@ -56,15 +55,15 @@ def train_q_learning(episodes,training = True,render = False): #episodes just me
 
             new_state,reward,terminated,_,_ = env.step(action)
 
-            #not sure whats happening here tbh
-            q_state_action_index = tuple(state) + (action,)
-            q_new_state_index = tuple(new_state)
+            q_state_action_index = tuple(state) + (action,) # Creates index of X,Y,Action
+            q_new_state_index = tuple(new_state) # Generic index of X',Y', where X',Y' is the new position after Action
 
             if training:
                 #Update q table with formula from class
                 q[q_state_action_index] = q[q_state_action_index] + alpha * (
                         reward + discount_factor * np.max(q[q_new_state_index]) - q[q_state_action_index]
                 )
+            
             #Update State
             state = new_state
 

@@ -20,7 +20,7 @@ register(
 class ThinIceEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 1}
 
-    def __init__(self, render_mode=None, path_to_level='Textfiles\Level3.txt'):
+    def __init__(self, render_mode=None, path_to_level='Textfiles\Level6.txt'):
         self.render_mode = render_mode
 
         # Initialize the level and player
@@ -31,8 +31,8 @@ class ThinIceEnv(gym.Env):
         self.action_space = spaces.Discrete(len(ti.PlayerActions))  #randomly select an action
         self.observation_space = spaces.Box(
             low=0, 
-            high= np.array([self.level.get_num_rows()-1, self.level.get_num_cols()-1, self.level.get_num_rows()-1, self.level.get_num_cols()-1]),
-            shape=(4,),
+            high= np.array([self.level.get_num_cols()-1, self.level.get_num_rows()-1]),
+            shape=(2,),
             dtype=np.int32
         )
         #displaying the grid in a window: human
@@ -74,7 +74,7 @@ class ThinIceEnv(gym.Env):
 
         self.player.reset(seed)
 
-        obs = np.concatenate((self.player.player_pos, self.player.target_pos))
+        obs = self.player.player_pos
 
         # Debug information
         info = {} 
@@ -90,7 +90,7 @@ class ThinIceEnv(gym.Env):
         reward = 1 if target_reached else 0
         terminated = target_reached
 
-        obs = np.concatenate((self.player.player_pos, self.player.target_pos))
+        obs = self.player.player_pos
 
         # Debug information
         info = {}
