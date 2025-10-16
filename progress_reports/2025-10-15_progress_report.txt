@@ -18,7 +18,7 @@ Kinjal
 
 Lujain
 	- Environment setup
-	- Implemented initial testing of custom environment with graph creation.
+	- Implemented initial testing of custom environment that leads agent to the target and graph creation.
 	- Setup README with testing instructions.
 
 Trista

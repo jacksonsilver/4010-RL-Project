@@ -1,25 +1,27 @@
 # COMP 4010 - Final Project
 
 ### Team Members: 
-- Jackson Silver     - 101224148
-- Kinjal Kamboj      - 101227444
-- Alexis Udechukwu   - 101225811
-- Trista Wang        - 
-- Lujain Sharafeldin - 101246804
+| Name               | Student ID |
+|------------------- |------------|
+| 1. Jackson Silver     | 101224148  |
+| 2. Kinjal Kamboj      | 101227444  | 
+| 3. Alexis Udechukwu   | 101225811  |
+| 4. Trista Wang        | 101231212  |
+| 5. Lujain Sharafeldin | 101246804  |
+
  
   
 ## Installation
 
 To install your new environment, run the following commands:
 
-1. Set up an environment (optional but recommended)
+1. Set up an environment
 
 ```{shell}
 python -m venv 4010Project
 .\4010Project\Scripts\activate
 python -m pip install -U pip #just to update
 ```
-**Note**: Do not push the 4010Project environment folder to GitHub.
 
 2. Install Requirements in project directory
 ```(shell)
