@@ -7,93 +7,110 @@ import pickle
 import v0_thin_ice_env #including it so it registers 
 import os
 
+from thin_ice_training_agent import ThinIceTrainingAgent
 
-### Using Q-Learning
-def train_q_learning(episodes,training = True,render = False): #episodes just means how many times
+class ThinIceQLearningAgent(ThinIceTrainingAgent):
+    def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
+        super().__init__(env_id, level_str)
 
-    env = gym.make('thin-ice-v0',render_mode ='human' if render else None)
+    def train(self, n_episodes: int = 100):
+        env = gym.make(self.env_id, level_str=self.level_str)
 
-    if(training):
         # Table Shape is Number of Cols (X) * Num of Rows (Y) * Number of Actions 
         q = np.zeros((env.unwrapped.level.get_num_cols(),
-              env.unwrapped.level.get_num_rows(),
-              env.action_space.n))
-    else:
-        #done training, want the results
-        f = open('v0_thin_ice_solution.pk1','rb')
-        q = pickle.load(f)
+            env.unwrapped.level.get_num_rows(),
+            env.action_space.n))
+
+        #Hyperparameters
+        alpha = 0.9 
+        discount_factor = 0.9 #can also be called gamma
+        epsilon = 1  #100% random actions
+
+        #keeping count of number of stesp per episode (is it becoming more efficient or not)
+        number_of_steps = np.zeros(n_episodes)
+
+        step_count = 0
+        for i in range(n_episodes):
+            print(f'Episode: {i}')
+
+            #Reset env before each episode
+            state = env.reset()[0]
+            terminated = False #terminated just means found target
+
+            while (not terminated):
+                
+                #picking an action based on episoln greedy
+                if random.random() < epsilon:
+                    action = env.action_space.sample()
+                else:
+                    #thing we learned in class
+                    q_state_index = tuple(state)
+                    action = np.argmax(q[q_state_index])
+
+                new_state,reward,terminated,_,_ = env.step(action)
+
+                q_state_action_index = tuple(state) + (action,) # Creates index of X,Y,Action
+                q_new_state_index = tuple(new_state) # Generic index of X',Y', where X',Y' is the new position after Action
+
+                #Update q table with formula from class
+                q[q_state_action_index] = q[q_state_action_index] + alpha * (
+                        reward + discount_factor * np.max(q[q_new_state_index]) - q[q_state_action_index]
+                )
+                
+                #Update State
+                state = new_state
+
+                step_count += 1
+                if terminated:
+                    #which means the goal was reached, keep note of step #
+                    number_of_steps[i] = step_count
+                    step_count = 0
+            
+            #decrease epsilon but why?
+            epsilon = max(epsilon - 1/n_episodes,0)
+
+        #for loop done
+        env.close()
+
+        self.generate_graph(number_of_steps)
+
+        f  = open(self.reference_name + '_solution.pk1',"wb")
+        pickle.dump(q,f)
         f.close()
 
-    #Hyperparameters
-    alpha = 0.9 
-    discount_factor = 0.9 #can also be called gamma
-    epsilon = 1  #100% random actions
+    def deploy(self, render: bool = True):
+        env = gym.make(self.env_id, level_str=self.level_str, render_mode="human" if render else None)
 
-    #keeping count of number of stesp per episode (is it becoming more efficient or not)
-    number_of_steps = np.zeros(episodes)
-
-    step_count = 0
-    for i in range(episodes):
-        if(render):
-            print(f'Episode: {i}')
+        #done training, want the results
+        f = open(self.reference_name + '_solution.pk1','rb')
+        q = pickle.load(f)
+        f.close()
 
         #Reset env before each episode
         state = env.reset()[0]
         terminated = False #terminated just means found target
 
         while (not terminated):
-            
-            #picking an action based on episoln greedy
-            if training and random.random() < epsilon:
-                action = env.action_space.sample()
-            else:
-                #thing we learned in class
-                q_state_index = tuple(state)
-                action = np.argmax(q[q_state_index])
+            # Get index based on state
+            q_state_index = tuple(state)
 
+            # Get action from Q table based on state
+            action = np.argmax(q[q_state_index])
+
+            # Perform the action
             new_state,reward,terminated,_,_ = env.step(action)
-
-            q_state_action_index = tuple(state) + (action,) # Creates index of X,Y,Action
-            q_new_state_index = tuple(new_state) # Generic index of X',Y', where X',Y' is the new position after Action
-
-            if training:
-                #Update q table with formula from class
-                q[q_state_action_index] = q[q_state_action_index] + alpha * (
-                        reward + discount_factor * np.max(q[q_new_state_index]) - q[q_state_action_index]
-                )
             
-            #Update State
+            # Update State
             state = new_state
 
-            step_count += 1
-            if terminated:
-                #which means the goal was reached, keep note of step #
-                number_of_steps[i] = step_count
-                step_count = 0
-        
-        #decrease epsilon but why?
-        epsilon = max(epsilon - 1/episodes,0)
-
-    #for loop done
-    env.close()
-
-    #graph everything where x = epsiodes and y = number of steps 
-    ''' notice in graph that first epsiodes have greater # of steps, still in training'''
-    sum_steps  = np.zeros(episodes)
-    for t in range(episodes):
-        sum_steps[t] = np.mean(number_of_steps[max(0,t-100):(t+1)]) #avg step
-    plt.plot(sum_steps)
-    path_for_graph = os.path.join(os.path.dirname(__file__), 'graphs_generated', 'v0_thin_ice_solution.png')
-    plt.savefig(path_for_graph)
-
-    if training:
-        f  = open('v0_thin_ice_solution.pk1',"wb")
-        pickle.dump(q,f)
-        f.close()
+        #for loop done
+        env.close()
+    
 
 if __name__ == '__main__':
-    train_q_learning(500,training=True,render=False) #for testing, keeping 2 as small number
-    train_q_learning(1,training=False,render=True)  
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
+    agent.train(500)
+    agent.deploy(render=True)
 
 
 
