@@ -1,5 +1,8 @@
 from enum import Enum
 import numpy as np
+from typing import Final
+
+PATH_TO_LEVELS: Final[str] = './level_txt_files/'
 
 # The actions that the player is capable of doing
 class PlayerActions(Enum):
@@ -52,12 +55,12 @@ class Tile():
         return str(self.tile_type)
     
 class Level:
-    def __init__(self, path_to_level):
+    def __init__(self, level_str: str):
         self.tiles = [] # 2D array of arrays of tiles
         self.player_start = None # The starting position of the player
         self.target = None # The position of the target tile
 
-        with open(path_to_level, 'r') as f:
+        with open(PATH_TO_LEVELS + level_str, 'r') as f:
             for line in f.readlines():
                 row = [] # An array of tiles
                 for char in line.strip():
