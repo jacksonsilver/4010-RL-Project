@@ -12,7 +12,9 @@ Jackson
 	- Implemented initial custom thin-ice environment creation with console rendering.
 
 Kinjal
-	- Environment Setup
+	- Environment Setup & helped debugging
+	- Setup initial interface running and provided guidance on text file creation
+	- Added initial assets for tile representation in pygame
 
 Lujain
 	- Environment setup
