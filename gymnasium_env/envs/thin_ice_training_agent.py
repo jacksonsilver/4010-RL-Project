@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from typing import Final
 
 GRAPHS_FOLDER_NAME: Final[str] = './graphs_generated/'
+PK_FOLDER_NAME: Final[str] = './pk_files_generated'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
@@ -33,3 +34,6 @@ class ThinIceTrainingAgent(ABC):
         plt.plot(sum_steps)
         path_for_graph = os.path.join(os.path.dirname(__file__), GRAPHS_FOLDER_NAME, graph_name)
         plt.savefig(path_for_graph)
+
+    def getPkFolderPath(self):
+        return os.path.join(os.path.dirname(__file__),PK_FOLDER_NAME)
