@@ -23,9 +23,10 @@ class ThinIceEnv(gym.Env):
     def __init__(self, render_mode=None, level_str='level_0.txt'):
         self.render_mode = render_mode
 
-        # Initialize the level and player
+        # Initialize the level, player, and target properties
         self.level = ti.Level(level_str)
         self.player = ti.ThinIcePlayer(self.level)
+        self.target = self.level.target
 
         # Define action and observation space
         self.action_space = spaces.Discrete(len(ti.PlayerActions))  #randomly select an action

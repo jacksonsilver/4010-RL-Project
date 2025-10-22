@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import random
 import pickle
 #import stable.baseliens3 import A2C
-import v0_thin_ice_env #including it so it registers 
+import v0_thin_ice_env as ti #including it so it registers 
 import os
 
 from thin_ice_training_agent import ThinIceTrainingAgent
@@ -13,18 +13,13 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
         super().__init__(env_id, level_str)
 
-    def train(self, n_episodes: int = 100):
-        env = gym.make(self.env_id, level_str=self.level_str)
+    def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
+        env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str)
 
-        # Table Shape is Number of Cols (X) * Num of Rows (Y) * Number of Actions 
-        q = np.zeros((env.unwrapped.level.get_num_cols(),
-            env.unwrapped.level.get_num_rows(),
-            env.action_space.n))
-
-        #Hyperparameters
-        alpha = 0.9 
-        discount_factor = 0.9 #can also be called gamma
-        epsilon = 1  #100% random actions
+        # Initialize Q(s,a) arbitrarily for all s in S, a in A
+        q = np.random.rand(env.unwrapped.level.get_num_cols(), env.unwrapped.level.get_num_rows(),
+            env.action_space.n)
+        q[env.unwrapped.target[0], env.unwrapped.target[1], :] = 0 # Ensure that goal (terminal) state is initialized to 0
 
         #keeping count of number of stesp per episode (is it becoming more efficient or not)
         number_of_steps = np.zeros(n_episodes)
@@ -40,8 +35,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
             while (not terminated):
                 
                 #picking an action based on episoln greedy
-                if random.random() < epsilon:
-                    action = env.action_space.sample()
+                if np.random.rand() < epsilon:
+                    action = np.random.choice(env.action_space.n)
                 else:
                     #thing we learned in class
                     q_state_index = tuple(state)
@@ -53,8 +48,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                 q_new_state_index = tuple(new_state) # Generic index of X',Y', where X',Y' is the new position after Action
 
                 #Update q table with formula from class
-                q[q_state_action_index] = q[q_state_action_index] + alpha * (
-                        reward + discount_factor * np.max(q[q_new_state_index]) - q[q_state_action_index]
+                q[q_state_action_index] = q[q_state_action_index] + step_size * (
+                        reward + gamma * np.max(q[q_new_state_index]) - q[q_state_action_index]
                 )
                 
                 #Update State
@@ -109,7 +104,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
 if __name__ == '__main__':
     agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_5.txt')
-    agent.train(500)
+    agent.train()
     agent.deploy(render=True)
 
 
