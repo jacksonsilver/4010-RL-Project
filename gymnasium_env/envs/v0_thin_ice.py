@@ -49,11 +49,19 @@ class LevelTileType(Enum):
 class Tile():
     def __init__(self, tile_type: LevelTileType, position: tuple):
         self._tile_type = tile_type
+        self._init_tile_type = tile_type
         self._position = position
+    
+    def reset(self):
+        self.tile_type = self._init_tile_type
     
     @property
     def tile_type(self):
         return self._tile_type
+    
+    @tile_type.setter
+    def tile_type(self, new_type: LevelTileType):
+        self._tile_type = new_type
     
     @property
     def position(self):
@@ -69,6 +77,12 @@ class Level:
     
     def reset(self):
         self._player_position = self.player_start
+
+        #  Reset tiles
+        for row in self.tiles:
+            for tile in row:
+                if tile.tile_type == LevelTileType.WATER:
+                    tile.tile_type = LevelTileType.FLOOR
 
     def generate_tiles(self, level_str: str):
         tiles_list = []
@@ -106,14 +120,31 @@ class Level:
         new_pos = (self.player_position[0] + action.get_direction()[0], self.player_position[1] + action.get_direction()[1])
 
         # Check if the new position is valid
-        tile = self.get_tile(new_pos)
-        if tile is not None and tile.tile_type != LevelTileType.WALL:
+        new_tile = self.get_tile(new_pos)
+        old_tile = self.get_tile(self.player_position)
+        if new_tile is not None and new_tile.tile_type != LevelTileType.WALL:
             print("Moving to ", new_pos)
             self._player_position = new_pos
         else:
             print("Invalid move to ", new_pos)
+
+        if old_tile.tile_type == LevelTileType.FLOOR:
+            old_tile.tile_type = LevelTileType.WATER
         
         return np.array_equal(self.player_position, self.target)
+    
+    def get_available_actions(self):
+        available_actions = []
+        for action in PlayerActions:
+            new_pos = (self.player_position[0] + action.get_direction()[0], self.player_position[1] + action.get_direction()[1])
+            new_tile = self.get_tile(new_pos)
+            if new_tile is not None and new_tile.tile_type not in(LevelTileType.WALL, LevelTileType.WATER):
+                available_actions.append(action.value)
+        if len(available_actions) == 0:
+            # No available actions, add all of them, player will lose anyways
+            available_actions.append(action in PlayerActions)
+        
+        return available_actions
     
     def render(self):
         print(self)
@@ -139,6 +170,10 @@ class Level:
     @property
     def player_position(self):
         return self._player_position
+    
+    @property
+    def player_position_tile(self):
+        return self.get_tile(self.player_position)
     
     @property
     def player_start(self):

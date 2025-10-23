@@ -31,8 +31,15 @@ class ThinIceEnv(gym.Env):
         state_num = 0
         for row in self.level.tiles:
             for tile in row:
-                if tile.tile_type in (ti.LevelTileType.FLOOR, ti.LevelTileType.TARGET):
-                    self._to_state[tile.position] = state_num
+                if tile.tile_type == ti.LevelTileType.TARGET:
+                    self._to_state[tile.position + (0,)] = state_num
+                    self._target = state_num
+                    state_num += 1
+                elif tile.tile_type == ti.LevelTileType.FLOOR:
+                    # Add state for floor and
+                    self._to_state[tile.position + (0,)] = state_num
+                    state_num += 1
+                    self._to_state[tile.position + (1,)] = state_num
                     state_num += 1
 
         self._to_cell = {v: k for k, v in self._to_state.items()}  # maps state # to (x, y)
@@ -40,14 +47,13 @@ class ThinIceEnv(gym.Env):
         # Define number of actions and states
         self._n_actions = len(ti.PlayerActions)
         self._n_states = state_num
-        self._target = self._to_state[self.level.target]
+
+        self.step_count = 0
 
         # Define action and observation space
         self.action_space = spaces.Discrete(self.n_actions)  #randomly select an action
-        self.observation_space = spaces.Box(
-            low=0, 
-            high= self.n_states-1,
-        )
+        # Observations are scalar state indices in [0, n_states-1]
+        self.observation_space = spaces.Discrete(self._n_states)
 
         # Displaying the grid in a window: human
         if self.render_mode == "human":
@@ -70,7 +76,8 @@ class ThinIceEnv(gym.Env):
                 'W': 'wall.webp',      
                 'T': 'target.webp',        
                 'F': 'floor.webp',  
-                'B': 'blank.webp'
+                'B': 'blank.webp',
+                '~': 'water.png',
             }
                 
             for tile, image_file in map_images.items():
@@ -86,9 +93,12 @@ class ThinIceEnv(gym.Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.level.reset()
+        self.step_count = 0
 
-        
-        obs = self._to_state[self.level.player_position]
+        if self.level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.WATER:
+            obs = self._to_state[self.level.player_position + (1,)]
+        else:
+            obs = self._to_state[self.level.player_position + (0,)]
 
         # Debug information
         info = {} 
@@ -99,13 +109,20 @@ class ThinIceEnv(gym.Env):
         return obs, info
 
     def step(self, action):
+        self.step_count += 1
         target_reached = self.level.perform_action(ti.PlayerActions(action))
 
+        #reward = (1 / self.step_count) * 5 # Trying things out
         reward = 1 if target_reached else 0
         terminated = target_reached
 
-        obs = self._to_state[self.level.player_position]
-
+        if self.level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.WATER:
+            reward = -1 # penalty for falling in water
+            terminated = True
+            obs = self._to_state[self.level.player_position + (1,)]
+        else:
+            obs = self._to_state[self.level.player_position + (0,)]
+        
         # Debug information
         info = {}
 
@@ -200,6 +217,6 @@ if __name__ == "__main__":
         action = env.action_space.sample()
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated:
-            print("Reached the target!")
+            print("Game over!")
             break
         

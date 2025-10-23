@@ -37,7 +37,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
                 # Choose action from state based on epsilon-greedy policy
                 if np.random.rand() < epsilon:
-                    action = np.random.choice(env.action_space.n)
+                    action = np.random.choice(env.unwrapped.level.get_available_actions()) # SELECTION WITH WATER LOGIC
+                    #action = np.random.choice(env.unwrapped.n_actions) # SELECTION BEFORE WATER LOGIC
                 else:
                     action = np.argmax(q[state])
 
@@ -94,7 +95,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_5.txt')
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
     agent.train()
     agent.deploy(render=True)
 
