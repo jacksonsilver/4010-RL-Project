@@ -23,20 +23,33 @@ class ThinIceEnv(gym.Env):
     def __init__(self, render_mode=None, level_str='level_0.txt'):
         self.render_mode = render_mode
 
-        # Initialize the level, player, and target properties
-        self.level = ti.Level(level_str)
-        self.player = ti.ThinIcePlayer(self.level)
-        self.target = self.level.target
+        # Initialize the level
+        self._level = ti.Level(level_str)
+
+        self._to_state = {}  # maps (x, y) to state #
+
+        state_num = 0
+        for row in self.level.tiles:
+            for tile in row:
+                if tile.tile_type in (ti.LevelTileType.FLOOR, ti.LevelTileType.TARGET):
+                    self._to_state[tile.position] = state_num
+                    state_num += 1
+
+        self._to_cell = {v: k for k, v in self._to_state.items()}  # maps state # to (x, y)
+
+        # Define number of actions and states
+        self._n_actions = len(ti.PlayerActions)
+        self._n_states = state_num
+        self._target = self._to_state[self.level.target]
 
         # Define action and observation space
-        self.action_space = spaces.Discrete(len(ti.PlayerActions))  #randomly select an action
+        self.action_space = spaces.Discrete(self.n_actions)  #randomly select an action
         self.observation_space = spaces.Box(
             low=0, 
-            high= np.array([self.level.get_num_cols()-1, self.level.get_num_rows()-1]),
-            shape=(2,),
-            dtype=np.int32
+            high= self.n_states-1,
         )
-        #displaying the grid in a window: human
+
+        # Displaying the grid in a window: human
         if self.render_mode == "human":
             pygame.init()
             self.cell_size = 32
@@ -45,7 +58,7 @@ class ThinIceEnv(gym.Env):
             self.window = None
             self.clock = None
 
-        #load tiles images
+        # Load tiles images
         self.tile_images = {}
         asset_path = "gymnasium_env/assets/"
 
@@ -72,26 +85,26 @@ class ThinIceEnv(gym.Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        self.level.reset()
 
-        self.player.reset(seed)
-
-        obs = self.player.player_pos
+        
+        obs = self._to_state[self.level.player_position]
 
         # Debug information
         info = {} 
 
         if self.render_mode == "human": 
-            # self.player.render() #for terminal debugging
+            # self.level.render() #for terminal debugging
             self.render_pygame()
         return obs, info
 
     def step(self, action):
-        target_reached = self.player.perform_action(ti.PlayerActions(action))
+        target_reached = self.level.perform_action(ti.PlayerActions(action))
 
         reward = 1 if target_reached else 0
         terminated = target_reached
 
-        obs = self.player.player_pos
+        obs = self._to_state[self.level.player_position]
 
         # Debug information
         info = {}
@@ -103,8 +116,9 @@ class ThinIceEnv(gym.Env):
         # Return observation, reward, done, truncated (not used [eg: after 200 steps stop]), info
         return obs, reward, terminated, False, info
     
+
     def render(self):
-        # self.player.render()
+        # self.level.render()
         if self.render_mode == "human":
             self.render_pygame()
 
@@ -120,9 +134,9 @@ class ThinIceEnv(gym.Env):
         surface = pygame.Surface((self.window_size, self.window_size))
         
         #draw the tiles for the leavez
-        for i in range(self.level.get_num_rows()):
-            for j in range(self.level.get_num_cols()):
-                tile = self.level.get_tile((j, i))
+        for i in range(self._level.n_rows):
+            for j in range(self._level.n_cols):
+                tile = self._level.get_tile((j, i))
                 if tile is not None:
                     tile_char = str(tile)
                     x = j * self.cell_size
@@ -133,11 +147,11 @@ class ThinIceEnv(gym.Env):
                         surface.blit(self.tile_images[tile_char], (x, y))
        
         # Draw penguin to move
-        player_x, player_y = self.player.player_pos
+        player_x, player_y = self.level.player_position
         px = player_x * self.cell_size
         py = player_y * self.cell_size
         
-        if self.level.get_tile(self.player.player_pos).tile_type == ti.LevelTileType.TARGET:
+        if self._level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.TARGET:
             surface.blit(self.tile_images['PT'], (px, py))
         else:  
             surface.blit(self.tile_images['PF'], (px, py))
@@ -147,6 +161,26 @@ class ThinIceEnv(gym.Env):
         #make sure the display is visible
         pygame.display.flip()
         self.clock.tick(4) #FPS using 4 instead of 1 to make it faster
+    
+    @property
+    def level(self) -> ti.Level:
+        return self._level
+    
+    @property
+    def n_actions(self):
+        return self._n_actions
+
+    @property
+    def n_states(self):
+        return self._n_states
+    
+    @property
+    def target(self):
+        return self._target
+
+    @property
+    def to_cell(self):
+        return self._to_cell
 
 
 # Run to test the environment
