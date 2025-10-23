@@ -73,6 +73,7 @@ class ThinIceEnv(gym.Env):
             map_images = {
                 'PF': 'floor_with_player.png',
                 'PT': 'target_with_player.png',     
+                'PW': 'water_with_player.png',
                 'W': 'wall.webp',      
                 'T': 'target.webp',        
                 'F': 'floor.webp',  
@@ -117,7 +118,7 @@ class ThinIceEnv(gym.Env):
         terminated = target_reached
 
         if self.level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.WATER:
-            reward = -1 # penalty for falling in water
+            reward = -1
             terminated = True
             obs = self._to_state[self.level.player_position + (1,)]
         else:
@@ -177,10 +178,13 @@ class ThinIceEnv(gym.Env):
 
         # choose penguin image (target vs floor)
         current_tile = self.level.get_tile((player_x, player_y))
-        if current_tile is not None and current_tile.tile_type == ti.LevelTileType.TARGET:
-            peng_img = self.tile_images.get('PT')
-        else:
-            peng_img = self.tile_images.get('PF')
+        if current_tile is not None:
+            if current_tile.tile_type == ti.LevelTileType.TARGET:
+                peng_img = self.tile_images.get('PT')
+            elif current_tile.tile_type == ti.LevelTileType.WATER:
+                peng_img = self.tile_images.get('PW')
+            else:
+                peng_img = self.tile_images.get('PF')
 
         if peng_img is not None:
             surface.blit(peng_img, (px, py))
