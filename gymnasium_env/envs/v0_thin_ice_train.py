@@ -19,7 +19,9 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         # Initialize Q table with random values for n_states x n_actions
         q = np.random.rand(env.unwrapped.n_states,
             env.unwrapped.n_actions)
-        q[env.unwrapped.target, :] = 0 # Ensure that goal (terminal) state is initialized to 0
+        # Ensure that goal (terminal) state(s) is initialized to 0
+        targets = env.unwrapped.target
+        q[targets, :] = 0
 
         #keeping count of number of stesp per episode (is it becoming more efficient or not)
         number_of_steps = np.zeros(n_episodes)
@@ -37,8 +39,20 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
                 # Choose action from state based on epsilon-greedy policy
                 if np.random.rand() < epsilon:
-                    action = np.random.choice(env.unwrapped.level.get_available_actions()) # SELECTION WITH WATER LOGIC
-                    #action = np.random.choice(env.unwrapped.n_actions) # SELECTION BEFORE WATER LOGIC
+                    # From the state value, get the available actions mask, which is an int where each bit represents an action
+                    available_actions_mask = env.unwrapped._to_cell[state][3]
+
+                    available_actions = []
+                    # Iterate over action bits (bit i corresponds to action i)
+                    for i_action in range(env.unwrapped.n_actions):
+                        if (available_actions_mask >> i_action) & 1: # Means that this action is == 1 and is available
+                            available_actions.append(i_action)
+
+                    # If there are no available actions, choose randomly from all actions
+                    if len(available_actions) == 0:
+                        available_actions = list(range(env.unwrapped.n_actions))
+                    
+                    action = np.random.choice(available_actions)
                 else:
                     action = np.argmax(q[state])
 
@@ -95,8 +109,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
-    agent.train()
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_4.txt')
+    agent.train(n_episodes=5000, step_size=0.5, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
 
 

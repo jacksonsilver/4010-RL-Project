@@ -30,6 +30,13 @@ class LevelTileType(Enum):
     WALL = 3
     TARGET = 4
 
+    def get_water_mask(self):
+        match(self):
+            case LevelTileType.WATER:
+                return 1
+            case _:
+                return 0
+
     # For printing the first letter of the tile
     def __str__(self):
         match(self):
@@ -116,7 +123,7 @@ class Level:
         return np.array(tiles_list, dtype=object)
     
     # Called in step function, returns True if reached target
-    def perform_action(self, action: PlayerActions) -> bool:         
+    def perform_action(self, action: PlayerActions):         
         new_pos = (self.player_position[0] + action.get_direction()[0], self.player_position[1] + action.get_direction()[1])
 
         # Check if the new position is valid
@@ -131,20 +138,22 @@ class Level:
         else:
             print("Invalid move to ", new_pos)
         
-        return np.array_equal(self.player_position, self.target)
+        # Return if target reached and if player successfully moved
+        return np.array_equal(self.player_position, self.target), np.array_equal(self.player_position, new_pos)
     
-    def get_available_actions(self):
-        available_actions = []
+    def get_available_actions(self, tile: Tile) -> int:
+        # Return a 4-bit mask (as int) where bit i corresponds to PlayerActions with value i
+        mask = 0
         for action in PlayerActions:
-            new_pos = (self.player_position[0] + action.get_direction()[0], self.player_position[1] + action.get_direction()[1])
+            dx, dy = action.get_direction()
+            new_pos = (tile.position[0] + dx, tile.position[1] + dy)
             new_tile = self.get_tile(new_pos)
-            if new_tile is not None and new_tile.tile_type not in(LevelTileType.WALL, LevelTileType.WATER):
-                available_actions.append(action.value)
-        if len(available_actions) == 0:
-            # No available actions, add all of them, player will lose anyways
-            available_actions.append(action in PlayerActions)
-        
-        return available_actions
+
+            # If action is available (not out of bounds and not wall or water), set the corresponding bit
+            if new_tile is not None and new_tile.tile_type not in (LevelTileType.WALL, LevelTileType.WATER):
+                mask |= (1 << action.value)
+
+        return mask
     
     def render(self):
         print(self)

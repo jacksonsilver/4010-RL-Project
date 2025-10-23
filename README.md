@@ -9,7 +9,20 @@
 | 4. Trista Wang        | 101231212  |
 | 5. Lujain Sharafeldin | 101246804  |
 
- 
+### MDP Explanation
+
+4 Actions: Left, Down, Right, Up
+
+States are represented in training as numbers, but in the environment they are represented as:
+    (X, Y, W-MASK, AVAIL-ACTION-MASK)
+
+Where X and Y are the tile's position
+
+W-MASK is a bit mask indicating if it's a water tile (1) or not
+And Avail-Action-Mask is a bit mask indicating what actions are available at that position.
+
+So, 1111 means all actions are available,
+1010, means that the agent can go left and right, but not up or down.
   
 ## Installation
 

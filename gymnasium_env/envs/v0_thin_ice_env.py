@@ -18,7 +18,7 @@ register(
 )
 
 class ThinIceEnv(gym.Env):
-    metadata = {"render_modes": ["human"], "render_fps": 1}
+    metadata = {"render_modes": ["human"], "render_fps": 2}
 
     def __init__(self, render_mode=None, level_str='level_0.txt'):
         self.render_mode = render_mode
@@ -26,21 +26,46 @@ class ThinIceEnv(gym.Env):
         # Initialize the level
         self._level = ti.Level(level_str)
 
-        self._to_state = {}  # maps (x, y) to state #
+        self._to_state = {}  # maps (x, y, W-MASK, AVAIL-ACTION-MASK) to state #
 
         state_num = 0
+        # collect all possible target state indices (any tile that is a TARGET)
+        self._target = []
+
+        # Build mapping from (x,y,water_mask,avail_mask) -> state index.
         for row in self.level.tiles:
             for tile in row:
-                if tile.tile_type == ti.LevelTileType.TARGET:
-                    self._to_state[tile.position + (0,)] = state_num
-                    self._target = state_num
-                    state_num += 1
-                elif tile.tile_type == ti.LevelTileType.FLOOR:
-                    # Add state for floor and
-                    self._to_state[tile.position + (0,)] = state_num
-                    state_num += 1
-                    self._to_state[tile.position + (1,)] = state_num
-                    state_num += 1
+                # Do not need states for blank/wall tiles since player cannot be on those
+                if tile.tile_type not in [ti.LevelTileType.FLOOR, ti.LevelTileType.WATER, ti.LevelTileType.TARGET]:
+                    continue
+
+                # water_options determines the possible values in the state representation for the water mask
+                water_options = []
+                if tile.tile_type == ti.LevelTileType.FLOOR:
+                    water_options = [ti.LevelTileType.FLOOR.get_water_mask(), ti.LevelTileType.WATER.get_water_mask()]
+                else:
+                    water_options = [tile.tile_type.get_water_mask()]
+
+                # Compute available actions mask for this tile (4-bit integer)
+                avail_mask = self._level.get_available_actions(tile)
+
+                # for each water option and for each submask of avail_mask, create a state
+                # For example, if the avail_mask was 1010, this would create submasks of 1010, 0010, 1000, and 0000.
+                for wmask in water_options:
+                    sub = avail_mask
+                    while True:
+                        key = tile.position + (wmask, sub)
+                        # map key to state number
+                        self._to_state[key] = state_num
+
+                        # include this state index in the list of target states if the tile is a TARGET
+                        if tile.tile_type == ti.LevelTileType.TARGET:
+                            self._target.append(state_num)
+                        
+                        state_num += 1
+                        if sub == 0:
+                            break
+                        sub = (sub - 1) & avail_mask
 
         self._to_cell = {v: k for k, v in self._to_state.items()}  # maps state # to (x, y)
 
@@ -96,10 +121,10 @@ class ThinIceEnv(gym.Env):
         self.level.reset()
         self.step_count = 0
 
-        if self.level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.WATER:
-            obs = self._to_state[self.level.player_position + (1,)]
-        else:
-            obs = self._to_state[self.level.player_position + (0,)]
+        player_position = self.level.player_position
+        player_tile = self.level.get_tile(player_position)
+        avail_mask = self.level.get_available_actions(player_tile)
+        obs = self._to_state[player_position + (player_tile.tile_type.get_water_mask(), avail_mask)]
 
         # Debug information
         info = {} 
@@ -111,18 +136,23 @@ class ThinIceEnv(gym.Env):
 
     def step(self, action):
         self.step_count += 1
-        target_reached = self.level.perform_action(ti.PlayerActions(action))
+        target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
 
-        #reward = (1 / self.step_count) * 5 # Trying things out
-        reward = 1 if target_reached else 0
+        if not position_changed:
+            self.step_count -= 1
+        
+        reward = self.step_count / 55 if position_changed else 0
+        reward = 1 if target_reached else reward
         terminated = target_reached
 
-        if self.level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.WATER:
+        player_position = self.level.player_position
+        player_tile = self.level.get_tile(player_position)
+        avail_mask = self.level.get_available_actions(player_tile)
+        obs = self._to_state[player_position + (player_tile.tile_type.get_water_mask(), avail_mask)]
+
+        if player_tile.tile_type == ti.LevelTileType.WATER:
             reward = -1
             terminated = True
-            obs = self._to_state[self.level.player_position + (1,)]
-        else:
-            obs = self._to_state[self.level.player_position + (0,)]
         
         # Debug information
         info = {}
