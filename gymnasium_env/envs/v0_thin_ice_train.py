@@ -64,7 +64,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         pickle.dump(q,f)
         f.close()
 
-    def deploy(self, render: bool = True):
+    def deploy(self, render: bool = True, max_steps: int = 500):
         env = gym.make(self.env_id, level_str=self.level_str, render_mode="human" if render else None)
 
         #done training, want the results
@@ -73,10 +73,12 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         f.close()
 
         #Reset env before each episode
+        step_count = 0
         state = env.reset()[0]
         terminated = False #terminated just means found target
 
-        while (not terminated):
+        while (not terminated and step_count < max_steps):
+            step_count += 1
 
             # Get action from Q table based on state
             action = np.argmax(q[state])

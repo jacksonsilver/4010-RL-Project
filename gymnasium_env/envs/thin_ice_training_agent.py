@@ -21,7 +21,7 @@ class ThinIceTrainingAgent(ABC):
         pass
 
     @abstractmethod
-    def deploy(self, render: bool = True):
+    def deploy(self, render: bool = True, max_steps: int = 500):
         pass
 
     def generate_graph(self, steps_per_episode: np.ndarray):
