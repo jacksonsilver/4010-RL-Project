@@ -147,37 +147,50 @@ class ThinIceEnv(gym.Env):
 
         if self.clock is None:
             self.clock = pygame.time.Clock()
-        #surface to draw the tiles on
+
+        # Pump events so the window remains responsive
+        pygame.event.pump()
+
+        # surface to draw the tiles on (reuse if desired)
         surface = pygame.Surface((self.window_size, self.window_size))
-        
-        #draw the tiles for the leavez
-        for i in range(self._level.n_rows):
-            for j in range(self._level.n_cols):
-                tile = self._level.get_tile((j, i))
+        surface.fill((255, 255, 255))
+
+        # draw the tiles for the level
+        for i in range(self.level.n_rows):
+            for j in range(self.level.n_cols):
+                tile = self.level.get_tile((j, i))
                 if tile is not None:
                     tile_char = str(tile)
-                    x = j * self.cell_size
-                    y = i * self.cell_size
-                    
-                    # Draw tile image 
-                    if tile_char in self.tile_images:
-                        surface.blit(self.tile_images[tile_char], (x, y))
-       
-        # Draw penguin to move
-        player_x, player_y = self.level.player_position
-        px = player_x * self.cell_size
-        py = player_y * self.cell_size
-        
-        if self._level.get_tile(self.level.player_position).tile_type == ti.LevelTileType.TARGET:
-            surface.blit(self.tile_images['PT'], (px, py))
-        else:  
-            surface.blit(self.tile_images['PF'], (px, py))
-       
-        # Update display(copy surface to window)
+                    x = int(j * self.cell_size)
+                    y = int(i * self.cell_size)
+
+                    # Draw tile image if available
+                    img = self.tile_images.get(tile_char)
+                    if img is not None:
+                        surface.blit(img, (x, y))
+
+        # Draw penguin to move (use integer positions)
+        ppos = self.level.player_position
+        player_x, player_y = int(ppos[0]), int(ppos[1])
+        px = int(player_x * self.cell_size)
+        py = int(player_y * self.cell_size)
+
+        # choose penguin image (target vs floor)
+        current_tile = self.level.get_tile((player_x, player_y))
+        if current_tile is not None and current_tile.tile_type == ti.LevelTileType.TARGET:
+            peng_img = self.tile_images.get('PT')
+        else:
+            peng_img = self.tile_images.get('PF')
+
+        if peng_img is not None:
+            surface.blit(peng_img, (px, py))
+
+        # Update display (copy surface to window)
         self.window.blit(surface, (0, 0))
-        #make sure the display is visible
         pygame.display.flip()
-        self.clock.tick(4) #FPS using 4 instead of 1 to make it faster
+        # cap framerate using metadata
+        fps = self.metadata.get('render_fps', 4)
+        self.clock.tick(fps)
     
     @property
     def level(self) -> ti.Level:
