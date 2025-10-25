@@ -146,7 +146,7 @@ class ThinIceEnv(gym.Env):
         # Determine reward
         self.visited_tiles.add(self.level.player_position)
         reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        #reward = reward + 1 if target_reached else reward
+        reward = reward + 1 if target_reached else reward
 
         # Set terminated if target is reached
         terminated = target_reached
