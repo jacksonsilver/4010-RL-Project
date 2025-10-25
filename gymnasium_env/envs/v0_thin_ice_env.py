@@ -176,7 +176,6 @@ class ThinIceEnv(gym.Env):
     
 
     def render(self):
-        # self.level.render()
         if self.render_mode == "human":
             self.render_pygame()
 
