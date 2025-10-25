@@ -28,10 +28,10 @@ class ThinIceEnv(gym.Env):
 
         self._to_state = {}  # maps (x, y, W-MASK, AVAIL-ACTION-MASK) to state #
 
-        state_num = 0
         # collect all possible target state indices (any tile that is a TARGET)
         self._target = []
 
+        state_num = 0
         # Build mapping from (x,y,water_mask,avail_mask) -> state index.
         for row in self.level.tiles:
             for tile in row:
@@ -73,6 +73,7 @@ class ThinIceEnv(gym.Env):
         self._n_actions = len(ti.PlayerActions)
         self._n_states = state_num
 
+        # Set visited tiles parameter
         self.visited_tiles = set()
 
         # Define action and observation space
@@ -117,14 +118,18 @@ class ThinIceEnv(gym.Env):
             self.tile_images = {}
 
     def reset(self, seed=None, options=None):
+        # Reset environment, level, and visited tiles
         super().reset(seed=seed)
         self.level.reset()
         self.visited_tiles = set()
 
+        # Determine initial state
         player_position = self.level.player_position
         player_tile = self.level.get_tile(player_position)
+        water_mask = player_tile.tile_type.get_water_mask()
         avail_mask = self.level.get_available_actions(player_tile)
-        obs = self._to_state[player_position + (player_tile.tile_type.get_water_mask(), avail_mask)]
+        # Set next state in observation
+        obs = self._to_state[player_position + (water_mask, avail_mask)]
 
         # Debug information
         info = {} 
@@ -135,19 +140,26 @@ class ThinIceEnv(gym.Env):
         return obs, info
 
     def step(self, action):
+        # Perform action
         target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
 
+        # Determine reward
         self.visited_tiles.add(self.level.player_position)
-        
         reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        reward = reward + 1 if target_reached else reward
+        #reward = reward + 1 if target_reached else reward
+
+        # Set terminated if target is reached
         terminated = target_reached
 
+        # Determine next state
         player_position = self.level.player_position
         player_tile = self.level.get_tile(player_position)
+        water_mask = player_tile.tile_type.get_water_mask()
         avail_mask = self.level.get_available_actions(player_tile)
-        obs = self._to_state[player_position + (player_tile.tile_type.get_water_mask(), avail_mask)]
+        # Set next state in observation
+        obs = self._to_state[player_position + (water_mask, avail_mask)]
 
+        # If player lands on water tile, end episode and give deinfluencing reward
         if player_tile.tile_type == ti.LevelTileType.WATER:
             reward = 0
             terminated = True

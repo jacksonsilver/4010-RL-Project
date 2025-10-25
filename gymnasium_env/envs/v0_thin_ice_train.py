@@ -109,8 +109,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_9.txt')
-    agent.train(n_episodes=50000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_8.txt')
+    #agent.train(n_episodes=10000, step_size=0.1, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
 
 
