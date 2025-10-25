@@ -73,7 +73,7 @@ class ThinIceEnv(gym.Env):
         self._n_actions = len(ti.PlayerActions)
         self._n_states = state_num
 
-        self.step_count = 0
+        self.visited_tiles = set()
 
         # Define action and observation space
         self.action_space = spaces.Discrete(self.n_actions)  #randomly select an action
@@ -119,7 +119,7 @@ class ThinIceEnv(gym.Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.level.reset()
-        self.step_count = 0
+        self.visited_tiles = set()
 
         player_position = self.level.player_position
         player_tile = self.level.get_tile(player_position)
@@ -135,14 +135,12 @@ class ThinIceEnv(gym.Env):
         return obs, info
 
     def step(self, action):
-        self.step_count += 1
         target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
 
-        if not position_changed:
-            self.step_count -= 1
+        self.visited_tiles.add(self.level.player_position)
         
-        reward = self.step_count / 55 if position_changed else 0
-        reward = 1 if target_reached else reward
+        reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
+        reward = reward + 1 if target_reached else reward
         terminated = target_reached
 
         player_position = self.level.player_position
@@ -151,7 +149,7 @@ class ThinIceEnv(gym.Env):
         obs = self._to_state[player_position + (player_tile.tile_type.get_water_mask(), avail_mask)]
 
         if player_tile.tile_type == ti.LevelTileType.WATER:
-            reward = -1
+            reward = 0
             terminated = True
         
         # Debug information
