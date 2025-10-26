@@ -109,10 +109,10 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_4.txt')
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_2.txt')
     agent.train(n_episodes=5000, step_size=0.5, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
-
+    agent.visualize_policy()
 
 
 
