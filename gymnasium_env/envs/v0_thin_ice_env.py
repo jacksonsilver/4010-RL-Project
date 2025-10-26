@@ -145,8 +145,13 @@ class ThinIceEnv(gym.Env):
 
         # Determine reward
         self.visited_tiles.add(self.level.player_position)
-        reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        reward = reward + 1 if target_reached else reward
+        reward = 1 if position_changed else 0
+        if (target_reached):
+            if (len(self.visited_tiles) == self.level.n_visitable_tiles - 1):
+                reward = 10
+            else:
+                reward = -10
+
 
         # Set terminated if target is reached
         terminated = target_reached
@@ -161,7 +166,7 @@ class ThinIceEnv(gym.Env):
 
         # If player lands on water tile, end episode and give deinfluencing reward
         if player_tile.tile_type == ti.LevelTileType.WATER:
-            reward = 0
+            reward = -10
             terminated = True
         
         # Debug information

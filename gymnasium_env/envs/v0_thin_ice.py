@@ -139,14 +139,15 @@ class Level:
         # Check if the new position is valid
         new_tile = self.get_tile(new_pos)
         old_tile = self.get_tile(self.player_position)
-        if new_tile is not None and new_tile.tile_type != LevelTileType.WALL:
-            if old_tile.tile_type == LevelTileType.FLOOR:
-                old_tile.tile_type = LevelTileType.WATER
 
-            print("Moving to ", new_pos)
+        if old_tile.tile_type == LevelTileType.FLOOR:
+            old_tile.tile_type = LevelTileType.WATER
+
+        if new_tile is not None and new_tile.tile_type != LevelTileType.WALL:
+            #print("Moving to ", new_pos)
             self._player_position = new_pos
-        else:
-            print("Invalid move to ", new_pos)
+        #else:
+         #   print("Invalid move to ", new_pos)
         
         # Return if target reached and if player successfully moved
         return np.array_equal(self.player_position, self.target), np.array_equal(self.player_position, new_pos)

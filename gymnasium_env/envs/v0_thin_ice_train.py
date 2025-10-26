@@ -27,7 +27,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         number_of_steps = np.zeros(n_episodes)
 
         for i in range(n_episodes):
-            print(f'Episode: {i}')
+            #print(f'Episode: {i}')
 
             #Reset env before each episode
             state = env.reset()[0]
@@ -60,9 +60,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
 
                 # Update q table with formula from class
-                next_action = np.argmax(q[next_state])
                 q[state, action] = q[state, action] + step_size * (
-                        reward + gamma * np.max(q[next_state, next_action]) - q[state, action]
+                        reward + gamma * q[next_state, np.argmax(q[next_state, :])] - q[state, action]
                 )
                 
                 # Update State
@@ -109,8 +108,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_8.txt')
-    #agent.train(n_episodes=25000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
+    agent.train(n_episodes=50000, step_size=0.1, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
 
 
