@@ -81,6 +81,7 @@ class Level:
     def __init__(self, level_str: str):
         self._tiles = self.generate_tiles(level_str)
         self._player_position = self.player_start
+        self._n_visitable_tiles = self.get_visitable_tile_count()
     
     def reset(self):
         self._player_position = self.player_start
@@ -122,6 +123,15 @@ class Level:
                 tiles_list.append(row)
         return np.array(tiles_list, dtype=object)
     
+
+    def get_visitable_tile_count(self):
+        count = 0
+        for row in self.tiles:
+            for tile in row:
+                if tile.tile_type in [LevelTileType.FLOOR, LevelTileType.TARGET]:
+                    count += 1
+        return count
+
     # Called in step function, returns True if reached target
     def perform_action(self, action: PlayerActions):         
         new_pos = (self.player_position[0] + action.get_direction()[0], self.player_position[1] + action.get_direction()[1])
@@ -171,6 +181,10 @@ class Level:
     @property
     def n_cols(self):
         return len(self.tiles[0]) if len(self.tiles) > 0 else 0
+    
+    @property
+    def n_visitable_tiles(self):
+        return self._n_visitable_tiles
     
     @property
     def tiles(self):
