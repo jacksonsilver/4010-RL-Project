@@ -145,12 +145,16 @@ class ThinIceEnv(gym.Env):
 
         # Determine reward
         self.visited_tiles.add(self.level.player_position)
-        reward = 1 if position_changed else 0
+
+        # Reward agent for new movement / penalize for no movement so it's encouraged to explore 
+        reward = 1 if position_changed else -1
         if (target_reached):
+            # Check that all tiles have been visited -> This is the correct behaviour so give the agent a huge reward for it
             if (len(self.visited_tiles) == self.level.n_visitable_tiles - 1):
-                reward = 10
+                reward = self.level.n_visitable_tiles * 2
             else:
-                reward = -10
+                # Regular reward for regular finish -> I originally penalized it for finishing wrong but it started prioritizing dying over finishing
+                reward = reward
 
 
         # Set terminated if target is reached
