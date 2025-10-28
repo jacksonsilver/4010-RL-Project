@@ -3,6 +3,13 @@ OCTOBER 30th Progress Report
 Progress in Past 2 Weeks:
 
 Alexis
+- Implemented code to compare RL algorithms (Dyna-Q, SARSA) in the ThinIce environment.
+- The comparison tracks average reward and success rate for each algorithm, and tests different parameter settings.
+- Summarized results to show which algorithm learns faster and performs better.
+
+Next 2 weeks:
+- Plan to add more algorithms or extend the environment for deeper comparison.
+- Will refine analysis based on feedback.
 
 Jackson
 - Added water logic to environment (i.e., floor tile converts to water tile after agent moves off, agent drowns in water)
