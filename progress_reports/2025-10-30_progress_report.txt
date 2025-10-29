@@ -19,6 +19,8 @@ Jackson
 - Converted environment and training to reflect how GridWorld in A2 is used (training uses state numbers provided by environment)
 
 Kinjal
+- Added method to visualize the optimal policy, starting position, target, and obstacles (walls/blanks) for any level on a grid (similar to A1/A2)
+- Will further test this for all levels after changes to step() and reward structure are completed
 
 Lujain
 
