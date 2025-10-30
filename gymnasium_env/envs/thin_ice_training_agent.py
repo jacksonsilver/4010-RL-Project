@@ -11,7 +11,7 @@ PK_FOLDER_NAME: Final[str] = './pk_files_generated'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
-    def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='level_0.txt'):
+    def __init__(self, env_id: str ='thin-ice-v1', level_str: str ='level_0.txt'):
         self.env_id: str = env_id
         self.level_str: str = level_str
         self.reference_name: str = self.env_id + "-" + self.level_str.split('.')[0]
