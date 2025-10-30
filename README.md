@@ -46,3 +46,4 @@ pip install -e .
 - Run  `gymnasium_env/envs/v0_thin_ice_env.py` 
 - Run  `gymnasium_env/envs/v0_thin_ice_QLearning.py` 
 - Run  `gymnasium_env/envs/v0_thin_ice_PPO.py` (not there *yet*)
+- Run `gymnasium_env/envs/v1_thin_ice_train.py` (For DQN)
