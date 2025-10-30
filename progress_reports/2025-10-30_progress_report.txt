@@ -3,15 +3,40 @@ OCTOBER 30th Progress Report
 Progress in Past 2 Weeks:
 
 Alexis
+- Implemented code to compare RL algorithms (Dyna-Q, SARSA) in the ThinIce environment.
+- The comparison tracks average reward and success rate for each algorithm, and tests different parameter settings.
+- Summarized results to show which algorithm learns faster and performs better.
+
+Next 2 weeks:
+- Plan to add more algorithms or extend the environment for deeper comparison.
+- Will refine analysis based on feedback.
 
 Jackson
+- Added water logic to environment (i.e., floor tile converts to water tile after agent moves off, agent drowns in water)
+- Modified reward structure to make agent take longest path in environment
+- Modularized code to make a reusable training agent that can be created for different learning algorithms
+- Updated environment to properly represent new MDP (new X,Y, W-MASK, AVAIL-ACTION mask states).
+- Converted environment and training to reflect how GridWorld in A2 is used (training uses state numbers provided by environment)
 
 Kinjal
+- Added method to visualize the optimal policy, starting position, target, and obstacles (walls/blanks) for any level on a grid (similar to A1/A2)
+- Will further test this for all levels after changes to step() and reward structure are completed
 
 Lujain
+- Started learning more about PPO Algorithm, as an alternative.
+- Researched implementations of PPO Algorithm and starting writing my own (but it doesnt really work all that well - so i didnt push it)
+- Got more familiar with other python libraries (eg: torch), that are faster than numpy, for the neural networks PPO uses.
 
 Trista
+- Implemented first iteration of DQN algorithm
+- Researched CNN and masking for neural networks
+- Learning PyTorch library to be able to monitor training in real time
 
-Main Accomplishment:
+Main Accomplishment: 
+Established working MDP structure for environment that when train, accomplishes agent goals in proposal.
+Created scalable training structure, so that we can begin to add and compare different learning algorithms
 
-Goals for next 2 weeks:
+Goals for next 2 weeks: 
+- Research and implement PPO and DQN learning algorithms (at least)
+- Modify environment and training back to having q matrix based on internal state values (rather than generic state numbers)
+- Look into (and modify environment and training accordingly), method to generalize training data to unseen levels.
