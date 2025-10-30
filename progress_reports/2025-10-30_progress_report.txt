@@ -28,6 +28,9 @@ Lujain
 - Got more familiar with other python libraries (eg: torch), that are faster than numpy, for the neural networks PPO uses.
 
 Trista
+- Implemented first iteration of DQN algorithm
+- Researched CNN and masking for neural networks
+- Learning PyTorch library to be able to monitor training in real time
 
 Main Accomplishment: 
 Established working MDP structure for environment that when train, accomplishes agent goals in proposal.
