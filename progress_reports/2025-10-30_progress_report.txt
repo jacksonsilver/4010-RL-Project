@@ -23,6 +23,9 @@ Kinjal
 - Will further test this for all levels after changes to step() and reward structure are completed
 
 Lujain
+- Started learning more about PPO Algorithm, as an alternative.
+- Researched implementations of PPO Algorithm and starting writing my own (but it doesnt really work all that well - so i didnt push it)
+- Got more familiar with other python libraries (eg: torch), that are faster than numpy, for the neural networks PPO uses.
 
 Trista
 
