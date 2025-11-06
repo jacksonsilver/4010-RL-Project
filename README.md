@@ -44,5 +44,8 @@ pip install -e .
 
 ## Running for Testing
 - Run  `gymnasium_env/envs/v0_thin_ice_env.py` 
-- Run  `gymnasium_env/envs/v0_thin_ice_QLearning.py` 
-- Run  `gymnasium_env/envs/v0_thin_ice_PPO.py` (not there *yet*)
+
+## Running Algorithms (QLearning & PPO)
+- Run  `gymnasium_env\envs\main.py` 
+
+

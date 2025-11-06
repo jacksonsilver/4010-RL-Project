@@ -1,5 +1,5 @@
 from v0_thin_ice_QLearning import ThinIceQLearningAgent
-from v0_thin_ice_PPO import ThinIcePPOAgent
+#from v0_thin_ice_PPO import ThinIcePPOAgent
 
 def QLearning(n_episodes,step_size,gamma,epsilon,level_number,train):
     agent = ThinIceQLearningAgent('thin-ice-v0', f'level_{level_number}.txt')
@@ -10,13 +10,13 @@ def QLearning(n_episodes,step_size,gamma,epsilon,level_number,train):
         agent.deploy(render=True)
         agent.visualize_policy()
 
-def PPO(gamma,lr,n_episodes,level_number,train):
-    agent = ThinIcePPOAgent('thin-ice-v0', f'level_{level_number}.txt')
+# def PPO(gamma,lr,n_episodes,level_number,train):
+#     agent = ThinIcePPOAgent('thin-ice-v0', f'level_{level_number}.txt')
 
-    if train:
-        agent.train(gamma,lr, n_episodes)
-    else:
-        agent.deploy(render=True)
+#     if train:
+#         agent.train(gamma,lr, n_episodes)
+#     else:
+#         agent.deploy(render=True)
 
 if __name__ == '__main__':
 
@@ -38,5 +38,5 @@ if __name__ == '__main__':
 
 
     #PPO(gamma,learning_rate,n_episodes,level_number,True)  #train
-    PPO(gamma,learning_rate,n_episodes,level_number,False)  #deploy
+    #PPO(gamma,learning_rate,n_episodes,level_number,False)  #deploy
 
