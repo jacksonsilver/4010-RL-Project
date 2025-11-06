@@ -4,6 +4,7 @@ COMP4010 Project - Custom Gym Environment for Thin Ice
 import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs.registration import register
+from gymnasium.envs.registration import registry
 from gymnasium.utils.env_checker import check_env
 
 import v0_thin_ice as ti
@@ -12,10 +13,11 @@ import pygame
 import os
 
 #Register -> to be able to use it as ID
-register(
-    id='thin-ice-v0', # unique id for the environment
-    entry_point='gymnasium_env.envs:ThinIceEnv', # module_name:class_name
-)
+if 'thin-ice-v0' not in registry:
+    register(
+        id='thin-ice-v0', # unique id for the environment
+        entry_point='gymnasium_env.envs:ThinIceEnv', # module_name:class_name
+    )
 
 class ThinIceEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 2}
