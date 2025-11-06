@@ -10,8 +10,10 @@ import matplotlib.patches as mpatches
 
 from typing import Final
 
-GRAPHS_FOLDER_NAME: Final[str] = './graphs_generated/'
-PK_FOLDER_NAME: Final[str] = './pk_files_generated'
+#base folders
+GRAPHS_FOLDER_NAME: Final[str] = './Graphs_generated/'
+PK_FOLDER_NAME: Final[str] = './PK_generated'
+
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
@@ -36,16 +38,19 @@ class ThinIceTrainingAgent(ABC):
         for t in range(n_episodes):
             sum_steps[t] = np.mean(steps_per_episode[max(0,t-100):(t+1)]) #avg step
         plt.plot(sum_steps)
-        path_for_graph = os.path.join(os.path.dirname(__file__), GRAPHS_FOLDER_NAME, graph_name)
+        path_for_graph = os.path.join(os.path.dirname(__file__), GRAPHS_FOLDER_NAME,"QLearning", graph_name)
         plt.savefig(path_for_graph)
 
-    def getPkFolderPath(self):
-        return os.path.join(os.path.dirname(__file__),PK_FOLDER_NAME)
+    def getPkFolderPath(self,algo):
+        return os.path.join(os.path.dirname(__file__),PK_FOLDER_NAME,algo)
+    
+    def getGraphFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),GRAPHS_FOLDER_NAME,algo)
     
 
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)
-        q_path = os.path.join(self.getPkFolderPath(), self.reference_name + '_solution.pk1')
+        q_path = os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1')
 
         with open(q_path, "rb") as f:
             q = pickle.load(f)
