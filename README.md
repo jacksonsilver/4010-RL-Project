@@ -42,10 +42,10 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-## Running for Testing
+## Running To See Environment
 - Run  `gymnasium_env/envs/v0_thin_ice_env.py` 
 
 ## Running Algorithms (QLearning & PPO)
-- Run  `gymnasium_env\envs\main.py` 
+- Run  `python gymnasium_env\envs\main.py` 
 
 

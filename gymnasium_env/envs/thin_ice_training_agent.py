@@ -13,6 +13,7 @@ from typing import Final
 #base folders
 GRAPHS_FOLDER_NAME: Final[str] = './Graphs_generated/'
 PK_FOLDER_NAME: Final[str] = './PK_generated'
+SOLUTION_FOLDER_NAME: Final[str] = './Agent_solutions'
 
 
 # An interface for training agents on Thin Ice Environment
@@ -47,7 +48,9 @@ class ThinIceTrainingAgent(ABC):
     def getGraphFolderPath(self,algo):
          return os.path.join(os.path.dirname(__file__),GRAPHS_FOLDER_NAME,algo)
     
-
+    def getAgentSolutionsFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),SOLUTION_FOLDER_NAME,algo)
+    
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)
         q_path = os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1')
