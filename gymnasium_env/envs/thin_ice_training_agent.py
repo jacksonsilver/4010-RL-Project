@@ -13,7 +13,7 @@ from typing import Final
 #base folders
 GRAPHS_FOLDER_NAME: Final[str] = './Graphs_generated/'
 PK_FOLDER_NAME: Final[str] = './PK_generated'
-
+POLICY_FOLDER_NAME: Final[str] = './Visualized_Policy_generated'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
@@ -138,4 +138,7 @@ class ThinIceTrainingAgent(ABC):
         ax.set_xticks(range(max_x))
         ax.set_yticks(range(max_y))
         ax.grid(True)
-        plt.show()
+        policy_name = self.reference_name + "policy-plot-generated.png"
+        path_for_policy = os.path.join(os.path.dirname(__file__), POLICY_FOLDER_NAME, "QLearning", policy_name)
+        plt.savefig(path_for_policy)
+        # plt.show()
