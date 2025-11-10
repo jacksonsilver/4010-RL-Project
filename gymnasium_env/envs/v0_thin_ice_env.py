@@ -145,13 +145,37 @@ class ThinIceEnv(gym.Env):
         # Perform action
         target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
 
-        # Determine reward
-        self.visited_tiles.add(self.level.player_position)
-        reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        reward = reward + 1 if target_reached else reward
+        player_position = self.level.player_position
+        player_tile = self.level.get_tile(player_position)
 
-        # Set terminated if target is reached
-        terminated = target_reached
+        reward = 0
+        terminated = False
+        
+        #agent discovers a new tile -> +5
+        if player_position not in self.visited_tiles:
+            self.visited_tiles.add(player_position)
+            reward += 5 
+            print("i got +5")
+
+        # agent dies -> -500 (trying to discourage from dying)
+        if player_tile.tile_type == ti.LevelTileType.WATER:
+            reward = -500  # Drown penalty
+            print("i got -500")
+            terminated = True
+        else:
+            if target_reached:
+                print(f'the number of visable tiles is: {self.level.n_visitable_tiles}')
+                print(f'the number of tiles i visited: {len(self.visited_tiles)}')
+
+                #if target is found and all the tiles are visisted -> max reward of a 100
+                if (len(self.visited_tiles)+1) == self.level.n_visitable_tiles:  
+
+                    reward += 100 
+                    print("i got +100")
+
+                # target is found but not all tiles are visited -> reward + tiles covered
+                else:
+                    reward += len(self.visited_tiles) * 2
 
         # Determine next state
         player_position = self.level.player_position
@@ -161,11 +185,6 @@ class ThinIceEnv(gym.Env):
         # Set next state in observation
         obs = self._to_state[player_position + (water_mask, avail_mask)]
 
-        # If player lands on water tile, end episode and give deinfluencing reward
-        if player_tile.tile_type == ti.LevelTileType.WATER:
-            reward = 0
-            terminated = True
-        
         # Debug information
         info = {}
 
@@ -174,8 +193,7 @@ class ThinIceEnv(gym.Env):
             self.render_pygame() 
         
         # Return observation, reward, done, truncated (not used [eg: after 200 steps stop]), info
-        return obs, reward, terminated, False, info
-    
+        return obs, reward, (terminated or target_reached), False, info
 
     def render(self):
         if self.render_mode == "human":
