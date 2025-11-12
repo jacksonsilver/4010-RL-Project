@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage[preprint]{neurips} 
 \usepackage{graphicx} % Required for inserting images
 
 \title{Reinforcement Learning for Thin Ice} 
@@ -19,6 +20,12 @@
 
 \subsection{Problem Focus}
 This project will focus on solving the puzzle game "Thin Ice" from Club Penguin using Reinforcement Learning. Thin Ice is a grid-based game where a player navigates a maze to  reach a target tile. A unique aspect of the game that adds more technicality is that each floor tile melts when stepped on, preventing tiles from being revisited and forcing the player to think carefully about the path they take to reach the target tile. 
-Our main goal is to train an RL agent to complete the different Thin Ice levels we have provided by reaching the target tile without drowning. Our agent can move in four directions: up, down, left, and right. We have different tiles in the environment: floor tiles (which the agent can walk on), wall tiles (which block movement), water tiles (which floor tiles turn into when stepped on by the agent and cause the agent to drown when the tile is revisited), and a target tile (the goal tile). In addition to reaching the target tile, we make our project more challenging by having another goal for our agent. In Thin Ice, players get the highest score by stepping on every floor tile on their path to the destination.
+Our main goal is to train an RL agent to complete the different Thin Ice levels we have provided by reaching the target tile without drowning. Our agent can move in four directions: up, down, left, and right. We have different tiles in the environment: floor tiles (which the agent can walk on), wall tiles (which block movement), water tiles (which floor tiles turn into when stepped on by the agent and cause the agent to drown when the tile is revisited), and a target tile (the goal tile). In addition to reaching the target tile, we make our project more challenging by having another goal for our agent. In Thin Ice, players get the highest score by stepping on every floor tile on their path to the destination. This feature increases the complexity of the task and provides an environment that's better suited for studying reinforcement learning algorithms.
+
+\subsection{Why Should We Care About This Problem?}
+Thin Ice is more than just a puzzle game. Its simple rules hide interesting challenges that make it a good environment for studying reinforcement learning. Because each tile melts after being stepped on, the agent has to plan their moves ahead instead of moving randomly. This allows the problem at hand to become similar to finding a Hamiltonian path, a route that visits each time once. Working on Thin Ice will give us a chance to see how RL can deal with limited choices, deal with risks and discover paths that paths that cover a whole space, making this project useful both for learning about RL in theory and for applying it to practical applications.
+
+\subsection{MDP Specifications}
+
 
 \end{document}
