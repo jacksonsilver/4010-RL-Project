@@ -149,7 +149,7 @@ class Level:
             print("Invalid move to ", new_pos)
         
         # Return if target reached and if player successfully moved
-        return np.array_equal(self.player_position, self.target), np.array_equal(self.player_position, new_pos)
+        return np.array_equal(self.player_position, self.target)
     
     def get_available_actions(self, tile: Tile) -> int:
         # Return a 4-bit mask (as int) where bit i corresponds to PlayerActions with value i

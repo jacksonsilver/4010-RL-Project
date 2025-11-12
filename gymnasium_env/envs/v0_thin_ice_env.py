@@ -123,7 +123,6 @@ class ThinIceEnv(gym.Env):
         # Reset environment, level, and visited tiles
         super().reset(seed=seed)
         self.level.reset()
-        self.visited_tiles = set()
 
         # Determine initial state
         player_position = self.level.player_position
@@ -132,6 +131,10 @@ class ThinIceEnv(gym.Env):
         avail_mask = self.level.get_available_actions(player_tile)
         # Set next state in observation
         obs = self._to_state[player_position + (water_mask, avail_mask)]
+
+        # Reset visited tiles to be just the current position
+        self.visited_tiles = set()
+        self.visited_tiles.add(player_position)
 
         # Debug information
         info = {} 
@@ -143,12 +146,13 @@ class ThinIceEnv(gym.Env):
 
     def step(self, action):
         # Perform action
-        target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
+        target_reached = self.level.perform_action(ti.PlayerActions(action))
 
-        # Determine reward
-        self.visited_tiles.add(self.level.player_position)
-        reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        reward = reward + 1 if target_reached else reward
+        reward = 0
+        # If player is visiting a new tile, give a reward of 1
+        if (self.level.player_position not in self.visited_tiles):
+            reward = 1
+            self.visited_tiles.add(self.level.player_position)
 
         # Set terminated if target is reached
         terminated = target_reached
