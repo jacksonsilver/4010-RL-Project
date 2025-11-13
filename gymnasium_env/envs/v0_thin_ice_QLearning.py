@@ -40,7 +40,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                 # Choose action from state based on epsilon-greedy policy
                 if np.random.rand() < epsilon:
                     # From the state value, get the available actions mask, which is an int where each bit represents an action
-                    available_actions_mask = env.unwrapped._to_cell[state][3]
+                    available_actions_mask = env.unwrapped.get_available_actions_mask(state)
 
                     available_actions = []
                     # Iterate over action bits (bit i corresponds to action i)
@@ -111,7 +111,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
 if __name__ == '__main__':
     agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
-    agent.train(n_episodes=30000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
 
 

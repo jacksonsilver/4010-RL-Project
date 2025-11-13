@@ -86,7 +86,7 @@ class ThinIceTrainingAgent(ABC):
         best_action_per_cell = {}
 
         for state in range(n_states):
-            x, y, w_mask, avail_mask = to_cell[state]
+            x, y, avail_mask = to_cell[state]
 
             if avail_mask == 0: #Skip blocked cells
                 continue
@@ -96,7 +96,7 @@ class ThinIceTrainingAgent(ABC):
 
             #Only keep the highest Q-value for each (x, y)
             if (x, y) not in best_action_per_cell or best_value > best_action_per_cell[(x, y)][1]:
-                best_action_per_cell[(x, y)] = (best_action, best_value, w_mask)
+                best_action_per_cell[(x, y)] = (best_action, best_value)
 
         #Get tiles for walls
         for row in env.unwrapped.level.tiles:
@@ -106,7 +106,7 @@ class ThinIceTrainingAgent(ABC):
                     plot_y = max_y - tile_y - 1
                     ax.add_patch(plt.Rectangle((tile_x - 0.5, plot_y - 0.5), 1, 1, color='black')) # Draw obstacle
 
-        for (x, y), (best_action, _, w_mask) in best_action_per_cell.items():
+        for (x, y), (best_action, _) in best_action_per_cell.items():
             plot_y = max_y - y - 1
 
             #Draw start/goal
