@@ -42,11 +42,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                     # From the state value, get the available actions mask, which is an int where each bit represents an action
                     available_actions_mask = env.unwrapped.get_available_actions_mask(state)
 
-                    available_actions = []
-                    # Iterate over action bits (bit i corresponds to action i)
-                    for i_action in range(env.unwrapped.n_actions):
-                        if (available_actions_mask >> i_action) & 1: # Means that this action is == 1 and is available
-                            available_actions.append(i_action)
+                    available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
 
                     # If there are no available actions, choose randomly from all actions
                     if len(available_actions) == 0:
