@@ -55,7 +55,7 @@ class ThinIceTrainingAgent(ABC):
         with open(q_path, "rb") as f:
             q = pickle.load(f)
 
-        to_cell = env.unwrapped._to_cell  #(x, y, w_mask, avail_mask)
+        to_cell = env.unwrapped._to_cell  #(x, y, avail_mask)
         n_states = env.unwrapped.n_states
 
         #Get map bounds

@@ -7,7 +7,7 @@ from gymnasium.envs.registration import register
 from gymnasium.envs.registration import registry
 from gymnasium.utils.env_checker import check_env
 
-import v0_thin_ice as ti
+import gymnasium_env.envs.v0_thin_ice as ti
 import numpy as np
 import pygame
 import os
@@ -55,7 +55,6 @@ class ThinIceEnv(gym.Env):
                     # include this state index in the list of target states if the tile is a TARGET
                     if tile.tile_type == ti.LevelTileType.TARGET:
                         self._target.append(state_num)
-                    
                     state_num += 1
 
         self._to_cell = {v: k for k, v in self._to_state.items()}  # maps state # to (x, y)
@@ -248,7 +247,12 @@ class ThinIceEnv(gym.Env):
     def to_cell(self):
         return self._to_cell
     
-    def get_all_possible_masks(self, available_action_mask: int) -> list[int]:
+    def get_available_actions_mask(self, state_num: int):
+        state_rep = self.to_cell[state_num]
+        return state_rep[2]
+    
+    @staticmethod
+    def get_all_possible_masks(available_action_mask: int) -> list[int]:
         possible_masks = []
         sub = available_action_mask
         while True:
@@ -258,9 +262,13 @@ class ThinIceEnv(gym.Env):
             sub = (sub - 1) & available_action_mask
         return possible_masks
     
-    def get_available_actions_mask(self, state_num: int):
-        state_rep = self.to_cell[state_num]
-        return state_rep[2]
+    @staticmethod
+    def action_mask_to_actions(action_mask) -> list[int]:
+        available_actions = []
+        for action in ti.PlayerActions:
+            if ((action_mask >> (len(ti.PlayerActions) -1 - action.value)) & 1):
+                available_actions.append(action.value)
+        return available_actions
 
 
 # Run to test the environment
