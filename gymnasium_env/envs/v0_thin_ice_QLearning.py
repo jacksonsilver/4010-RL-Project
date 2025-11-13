@@ -74,7 +74,6 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         env.close()
 
         self.generate_graph(number_of_steps)
-        self.visualize_policy()
 
         f = open(os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1'), "wb")
         pickle.dump(q,f)
@@ -110,11 +109,10 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_7.txt')
     agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
-
-
+    agent.visualize_policy()
 
 
                       

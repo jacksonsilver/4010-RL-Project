@@ -51,13 +51,12 @@ class ThinIceTrainingAgent(ABC):
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)
         q_path = os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1')
-
+        
         with open(q_path, "rb") as f:
             q = pickle.load(f)
 
         to_cell = env.unwrapped._to_cell  #(x, y, w_mask, avail_mask)
         n_states = env.unwrapped.n_states
-        n_actions = env.unwrapped.n_actions
 
         #Get map bounds
         max_x = env.unwrapped.level.n_cols
@@ -69,19 +68,23 @@ class ThinIceTrainingAgent(ABC):
         ax.set_ylim(-0.5, max_y - 0.5)
         ax.set_aspect('equal')
 
+        visited_tiles = set()
+        state = env.reset()[0]
+        terminated = False
+        step_count = 0
+        max_steps = 500  #prevent infinite loop
+
+        #Get visited tiles to draw arrows on plot
+        while not terminated and step_count < max_steps:
+            step_count += 1
+            x, y, _ = to_cell[state]
+            visited_tiles.add((x, y))
+            action = np.argmax(q[state])
+            state, reward, terminated, _, _ = env.step(action)
+            env.close()
+
         start_pos = env.unwrapped.level.player_start
         goal_pos = env.unwrapped.level.target 
-
-        #Find states that correspond to start_pos and goal_pos
-        start_states = [s for s in range(n_states) if to_cell[s][0:2] == start_pos]
-        goal_states = [s for s in range(n_states) if to_cell[s][0:2] == goal_pos]
-
-        #Pick the first matching state
-        start_state = start_states[0] if start_states else None
-        goal_state = goal_states[0] if goal_states else None
-
-        start_x, start_y = to_cell[start_state][0:2]
-        goal_x, goal_y = to_cell[goal_state][0:2]
 
         best_action_per_cell = {}
 
@@ -107,6 +110,10 @@ class ThinIceTrainingAgent(ABC):
                     ax.add_patch(plt.Rectangle((tile_x - 0.5, plot_y - 0.5), 1, 1, color='black')) # Draw obstacle
 
         for (x, y), (best_action, _) in best_action_per_cell.items():
+
+            if visited_tiles and (x, y) not in visited_tiles:
+                continue
+
             plot_y = max_y - y - 1
 
             #Draw start/goal
