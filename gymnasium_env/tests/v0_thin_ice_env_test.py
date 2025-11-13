@@ -124,7 +124,7 @@ class TestActionMaskToActionConversions(unittest.TestCase):
         for mask_val in [0, 1, 3, 7, 15]:
             actions = ThinIceEnv.action_mask_to_actions(mask_val)
             self.assertEqual(len(actions), len(set(actions)), 
-                           f"Submasks for {mask_val} contain duplicates: {actions}")
+                           f"actions for {mask_val} contain duplicates: {actions}")
 
 class TestActionMaskCreation(unittest.TestCase):
     def setUp(self):
