@@ -7,6 +7,9 @@ Alexis
 Jackson
 
 Kinjal
+- Worked briefly on DQN implementation to see if tweaking reward and step structure can help agent to train on certain levels better, expect to further work on this
+- Added logic to refine the policy plot visualized for each level (path does not include tiles not visited), refactored to work without w_mask
+- Started work on the Project Report and expect to further work on this
 
 Lujain
 
