@@ -7,6 +7,9 @@ Alexis
 Jackson
 
 Kinjal
+- Worked briefly on DQN implementation to see if tweaking reward and weights can help the agent to train on certain levels better and solve the maze correctly
+- Added logic to refine the policy plot visualized for each level (path does not include tiles not visited, path displays correct action taken), refactored to work without w_mask
+- Started work on the Project Report (MDP Specifications section) and expect to work on other sections
 
 Lujain
 
