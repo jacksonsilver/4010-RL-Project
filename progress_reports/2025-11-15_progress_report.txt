@@ -23,8 +23,9 @@ Lujain
 - Renamed all the places files were being generated - so they arent everywhere
 - created a "main" file, just to make it look neater (better UI)
 
-
 Trista
+- Changed perform_action function and reward values in attempt to reduce invalid actions and improve performance in DQN 
+- Run agent for more time steps to see if more training improved performance or plateaued
 
 Main Accomplishment: 
 -  Impleented feedback from env demo
