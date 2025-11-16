@@ -23,9 +23,9 @@ class ThinIceTrainingAgent(ABC):
         self.level_str: str = level_str
         self.reference_name: str = self.env_id + "-" + self.level_str.split('.')[0]
 
-    @abstractmethod
-    def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
-        pass
+    # @abstractmethod
+    # def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
+    #     pass
 
     @abstractmethod
     def deploy(self, render: bool = True, max_steps: int = 500):
