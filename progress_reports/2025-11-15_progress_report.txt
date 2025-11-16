@@ -6,6 +6,10 @@ Alexis
 Worked on the introduction section of the Project Report
 
 Jackson
+- Modified MDP to ensure reward is not dependent on previous steps (+1 for newly visited tile that isn't water; otherwise 0)
+- Modified state representation to not have w_mask. To respond to env demo feedback - the player could technically walk on water but only as a final terminal step. So in the current algorithms I don't believe this mattered (since we never updated or used the state value of the terminal water states), but this may have mattered in a different algorithm so I kept it in initially.
+- Tested and debugged action mask calculations, conversions, etc. Unfortunately it was wrong before but now it's been fixed so we can trust our algorithms
+- Implemented decaying buffer for QLearning, going to add it to dynaq.
 
 Kinjal
 - Worked briefly on DQN implementation to see if tweaking reward and step structure can help agent to train on certain levels better, expect to further work on this
@@ -17,5 +21,12 @@ Lujain
 Trista
 
 Main Accomplishment: 
+-  Impleented feedback from env demo
+-  Tested and fixed state representations
+-  PPO and DynaQ
 
 Goals for next 2 weeks: 
+- Finish PPO and CNN extension?
+- Try to generalize to unseen levels
+- Have a good basis for report.
+- Better statistical analysis of algorithms.
