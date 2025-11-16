@@ -17,6 +17,12 @@ Kinjal
 - Started work on the Project Report and expect to further work on this
 
 Lujain
+- Implemented PPO using Mlp (after training - realized it did not work properly)
+- Ended up implementing PPO using CNN, works a lot better but only on smaller levels, working on this more for the next week.
+- Generation of Graphs of rewards vs epsiode number (show that it converges)
+- Renamed all the places files were being generated - so they arent everywhere
+- created a "main" file, just to make it look neater (better UI)
+
 
 Trista
 
@@ -26,7 +32,8 @@ Main Accomplishment:
 -  PPO and DynaQ
 
 Goals for next 2 weeks: 
+h more about optimizing PPO, since it only works on "simpler" levels, maybe changing reward structure, hyperparamaters, certain implementation,etc
 - Finish PPO and CNN extension?
-- Try to generalize to unseen levels
+- Try to generalize to unseen levels or add tile type that doesn't melt right away (takes 2 walk ons)
 - Have a good basis for report.
 - Better statistical analysis of algorithms.
