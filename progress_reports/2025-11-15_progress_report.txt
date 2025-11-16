@@ -12,9 +12,9 @@ Jackson
 - Implemented decaying buffer for QLearning, going to add it to dynaq.
 
 Kinjal
-- Worked briefly on DQN implementation to see if tweaking reward and step structure can help agent to train on certain levels better, expect to further work on this
-- Added logic to refine the policy plot visualized for each level (path does not include tiles not visited), refactored to work without w_mask
-- Started work on the Project Report and expect to further work on this
+- Worked briefly on DQN implementation to see if tweaking reward and weights can help the agent to train on certain levels better and solve the maze correctly
+- Added logic to refine the policy plot visualized for each level (path does not include tiles not visited, path displays correct action taken), refactored to work without w_mask
+- Started work on the Project Report (MDP Specifications section) and expect to work on other sections
 
 Lujain
 - Implemented PPO using Mlp (after training - realized it did not work properly)
@@ -23,8 +23,9 @@ Lujain
 - Renamed all the places files were being generated - so they arent everywhere
 - created a "main" file, just to make it look neater (better UI)
 
-
 Trista
+- Changed perform_action function and reward values in attempt to reduce invalid actions and improve performance in DQN 
+- Run agent for more time steps to see if more training improved performance or plateaued
 
 Main Accomplishment: 
 -  Impleented feedback from env demo
@@ -32,8 +33,8 @@ Main Accomplishment:
 -  PPO and DynaQ
 
 Goals for next 2 weeks: 
-h more about optimizing PPO, since it only works on "simpler" levels, maybe changing reward structure, hyperparamaters, certain implementation,etc
+- Research more about optimizing PPO, since it only works on "simpler" levels, maybe changing reward structure, hyperparamaters, certain implementation,etc
 - Finish PPO and CNN extension?
-- Try to generalize to unseen levels or add tile type that doesn't melt right away (takes 2 walk ons)
+- Try to generalize to unseen levels
 - Have a good basis for report.
 - Better statistical analysis of algorithms.
