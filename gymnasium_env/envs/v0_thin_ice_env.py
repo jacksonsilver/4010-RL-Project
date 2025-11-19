@@ -272,6 +272,16 @@ class ThinIceEnv(gym.Env):
             if ((action_mask >> (len(ti.PlayerActions) -1 - action.value)) & 1):
                 available_actions.append(action.value)
         return available_actions
+    
+    def get_actions_boolean_list(self,available_actions):
+        boolean_mask = [False] * self.n_actions
+        
+        for action in available_actions:
+            if 0 <= action < self.n_actions: 
+                boolean_mask[action] = True
+        
+        return boolean_mask
+
 
 
 # Run to test the environment

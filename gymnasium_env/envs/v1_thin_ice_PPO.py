@@ -77,8 +77,8 @@ class CNNPolicy(nn.Module):
         return self.fc_v(x) 
 
 class ThinIcePPOAgent(ThinIceTrainingAgent):
-    def __init__(self, env_id='thin-ice-v0', level_str='Level1.txt'):
-        super().__init__("PPO", env_id, level_str)
+    def __init__(self, env_id='thin-ice-v0', level_str='level_1.txt'):
+        super().__init__("PPO",env_id, level_str)
     
     def train(self, gamma=0.99, learning_rate=0.0003, n_episodes=2000):
         print("===== Beginning Training")
@@ -136,9 +136,13 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                 state_tensor = self.state_index_to_tensor(env,state)
 
                 raw_mask = env.unwrapped.get_available_actions_mask(state)
+                available_actions = env.unwrapped.action_mask_to_actions(raw_mask)
+                print(f"AGENT CAN ONLY GO: {raw_mask}")
+                print(f"WHICH MEANS AGENT CAN ONLY GO {available_actions}")
+                actions_bool = env.unwrapped.get_actions_boolean_list(available_actions)
+                print(f"boolean looks like: {actions_bool}")
 
-                action_mask = [(raw_mask >> i) & 1 == 1 for i in range(env.action_space.n)]  # list of bools
-                action_mask = torch.tensor(action_mask, dtype=torch.bool).unsqueeze(0).to(device)
+                action_mask = torch.tensor(actions_bool, dtype=torch.bool).unsqueeze(0).to(device)
 
                 # print(f'my avail mask is: {action_mask}')
                 # print("test")
@@ -378,7 +382,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
 
             if render and terminated:
                 filename = self.reference_name + f'_agent_final_path.png'
-                filepath = self.getPkFolderPath("PPO")
+                filepath = self.getAgentSolutionsFolderPath("PPO")
                 pygame.image.save(pygame.display.get_surface(), os.path.join(filepath, filename))
 
                 print(f'Created Snapshot of final path: {filename}')
@@ -390,4 +394,3 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         pygame.quit()
 
         return
-

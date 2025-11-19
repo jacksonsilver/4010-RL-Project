@@ -16,6 +16,38 @@ def QLearning(n_episodes,step_size,gamma,epsilon,level_number,train):
         agent.deploy(render=True)
         agent.visualize_policy()
 
+def all_levels(gamma,learning_rate):
+    
+    #1,2,3
+    '''
+    worked with reward +1 and FINLA REWARD OF -1 
+    entrop = 0.1
+    '''
+    # for i in range(1,4):
+    #     print(f'cURRENTLY LEVEL {i}')
+    #     PPO(gamma,learning_rate,100,i,train = True,saveToLog=True)  #train
+    #     PPO(gamma,learning_rate,100,i,train = False)  #deploy
+    
+
+    # #4,5
+    # for i in range(4,7):
+    #     print(f'cURRENTLY LEVEL {i}')
+    #     PPO(gamma,learning_rate,800,i,train = True,saveToLog=True)  #train
+    #     PPO(gamma,learning_rate,800,i,train = False)  #deploy
+
+    # 6,7,8,9
+    # for i in range(6,10):
+    #     print(f'cURRENTLY LEVEL {i}')
+    #     PPO(gamma,learning_rate,2000,i,train = True,saveToLog=True)  #train
+    #     PPO(gamma,learning_rate,2000,i,train = False)  #deploy
+
+    # #10,11
+    # for i in range(10,12):
+    #     print(f'cURRENTLY LEVEL {i}')
+    #     PPO(gamma,learning_rate,1500,i,train = True,saveToLog=True)  #train
+    #     PPO(gamma,learning_rate,1500,i,train = False)  #deploy
+
+
 def PPO(gamma,lr,n_episodes,level_number,train,saveToLog  = False):
     agent = ThinIcePPOAgent('thin-ice-v0', f'level_{level_number}.txt')
 
@@ -48,45 +80,13 @@ if __name__ == '__main__':
     learning_rate = 0.0003
 
     #Level we are working with
-    level_number = 7
+    level_number = 4
 
-    PPO(gamma,learning_rate,2000,level_number,train = True,saveToLog=True)  #train
-    PPO(gamma,learning_rate,2000,level_number,train = False)  #deploy
+    PPO(gamma,learning_rate,800,level_number,train = True,saveToLog=True)  #train
+    PPO(gamma,learning_rate,800,level_number,train = False)  #deploy
     
     '''Algorithms currently implemented'''
 
     #QLearning(n_episodes,step_size,gamma,epsilon,level_number,train = True)
     #QLearning(n_episodes,step_size,gamma,epsilon,level_number,train = False)
-
-
-    #1,2,3
-    '''
-    worked with reward +1 and FINLA REWARD OF -1 
-    entrop = 0.1
-    '''
-    # for i in range(1,4):
-    #     print(f'cURRENTLY LEVEL {i}')
-    #     PPO(gamma,learning_rate,100,i,train = True,saveToLog=True)  #train
-    #     PPO(gamma,learning_rate,100,i,train = False)  #deploy
-    
-
-    # #4,5
-    # for i in range(4,7):
-    #     print(f'cURRENTLY LEVEL {i}')
-    #     PPO(gamma,learning_rate,800,i,train = True,saveToLog=True)  #train
-    #     PPO(gamma,learning_rate,800,i,train = False)  #deploy
-
-    # 6,7,8,9
-    # for i in range(6,10):
-    #     print(f'cURRENTLY LEVEL {i}')
-    #     PPO(gamma,learning_rate,2000,i,train = True,saveToLog=True)  #train
-    #     PPO(gamma,learning_rate,2000,i,train = False)  #deploy
-
-    # #10,11
-    # for i in range(10,12):
-    #     print(f'cURRENTLY LEVEL {i}')
-    #     PPO(gamma,learning_rate,1500,i,train = True,saveToLog=True)  #train
-    #     PPO(gamma,learning_rate,1500,i,train = False)  #deploy
-
-
 
