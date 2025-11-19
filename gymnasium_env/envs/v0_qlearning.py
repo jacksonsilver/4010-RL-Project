@@ -1,17 +1,15 @@
 import gymnasium as gym
 import numpy as np
-import matplotlib.pyplot as plt
-import random
 import pickle
-#import stable.baseliens3 import A2C
 import v0_thin_ice_env as ti #including it so it registers 
 import os
 
 from thin_ice_training_agent import ThinIceTrainingAgent
+from gymnasium_env.envs.components.decaying_epsilon import DecayingEpsilon
 
 class ThinIceQLearningAgent(ThinIceTrainingAgent):
     def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
-        super().__init__(env_id, level_str)
+        super().__init__("QLearning", env_id, level_str)
 
     def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str)
@@ -26,27 +24,25 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         #keeping count of number of stesp per episode (is it becoming more efficient or not)
         number_of_steps = np.zeros(n_episodes)
 
+        decaying_epsilon = DecayingEpsilon(start_epsilon=epsilon, end_epsilon=0.05, decay_rate=4000000)
+
         for i in range(n_episodes):
             print(f'Episode: {i}')
 
             #Reset env before each episode
             state = env.reset()[0]
             step_count = 0
-            terminated = False #terminated just means found target
+            terminated = False
 
             while (not terminated):
                 step_count += 1
 
                 # Choose action from state based on epsilon-greedy policy
-                if np.random.rand() < epsilon:
+                if np.random.rand() < decaying_epsilon.get_epsilon():
                     # From the state value, get the available actions mask, which is an int where each bit represents an action
-                    available_actions_mask = env.unwrapped._to_cell[state][3]
+                    available_actions_mask = env.unwrapped.get_available_actions_mask(state)
 
-                    available_actions = []
-                    # Iterate over action bits (bit i corresponds to action i)
-                    for i_action in range(env.unwrapped.n_actions):
-                        if (available_actions_mask >> i_action) & 1: # Means that this action is == 1 and is available
-                            available_actions.append(i_action)
+                    available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
 
                     # If there are no available actions, choose randomly from all actions
                     if len(available_actions) == 0:
@@ -70,12 +66,14 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
             
             number_of_steps[i] = step_count
 
+            decaying_epsilon.update(i)
+
         #for loop done
         env.close()
 
         self.generate_graph(number_of_steps)
 
-        f = open(os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1'), "wb")
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "wb")
         pickle.dump(q,f)
         f.close()
 
@@ -83,7 +81,7 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         env = gym.make(self.env_id, level_str=self.level_str, render_mode="human" if render else None)
 
         #done training, want the results
-        f = open(os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1'), "rb")
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "rb")
         q = pickle.load(f)
         f.close()
 
@@ -109,13 +107,10 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
     
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_8.txt')
-    agent.train(n_episodes=25000, step_size=0.1, gamma=1, epsilon=0.1)
-    #agent.deploy(render=True)
-    #agent.visualize_policy()
-
-
-
+    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
+    agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.4)
+    agent.deploy(render=True)
+    agent.visualize_policy()
 
 
                       
