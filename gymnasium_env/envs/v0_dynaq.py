@@ -1,19 +1,17 @@
 import gymnasium as gym
 import numpy as np
-import matplotlib.pyplot as plt
-import random
 import pickle
-#import stable.baseliens3 import A2C
 import v0_thin_ice_env as ti #including it so it registers 
 import os
 
 from thin_ice_training_agent import ThinIceTrainingAgent
+from components.replay_buffer import ReplayBuffer
 
-class ThinIceQLearningAgent(ThinIceTrainingAgent):
+class ThincIceDynaQAgent(ThinIceTrainingAgent):
     def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
-        super().__init__(env_id, level_str)
-
-    def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
+        super().__init__("DynaQ", env_id, level_str)
+    
+    def train(self, gamma=0.99, step_size=0.1, epsilon=0.1, n_episodes=1000, max_model_step=10):
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str)
 
         # Initialize Q table with random values for n_states x n_actions
@@ -23,18 +21,18 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         targets = env.unwrapped.target
         q[targets, :] = 0
 
-        #keeping count of number of stesp per episode (is it becoming more efficient or not)
+        model = ReplayBuffer(step_size, gamma, max_step=max_model_step)
+
         number_of_steps = np.zeros(n_episodes)
 
         for i in range(n_episodes):
             print(f'Episode: {i}')
 
-            #Reset env before each episode
             state = env.reset()[0]
+            terminated = False
             step_count = 0
-            terminated = False #terminated just means found target
 
-            while (not terminated):
+            while not terminated:
                 step_count += 1
 
                 # Choose action from state based on epsilon-greedy policy
@@ -51,35 +49,49 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                     action = np.random.choice(available_actions)
                 else:
                     action = np.argmax(q[state])
-
-                next_state,reward,terminated,_,_ = env.step(action)
-
-
-                # Update q table with formula from class
-                next_action = np.argmax(q[next_state])
-                q[state, action] = q[state, action] + step_size * (
-                        reward + gamma * np.max(q[next_state, next_action]) - q[state, action]
-                )
                 
-                # Update State
+                next_state, reward, terminated, truncated, _ = env.step(action)
+
+                if truncated:
+                    terminated = True
+
+                if terminated:
+                    q_target = reward
+                else:
+                    next_action = np.argmax(q[next_state])
+                    q_target = reward + gamma * q[next_state, next_action]
+                
+                q[state, action] = q[state, action] + step_size * (q_target - q[state, action])
+
+                model.UpdateExperiences(state, action, reward, next_state)
+
+                model.UpdateQ(q)
+
                 state = next_state
             
             number_of_steps[i] = step_count
 
+        policy = np.zeros((env.n_states, env.n_actions))
+        for i in range(env.n_states):
+            best_action = np.argmax(q[i])
+            policy[i, best_action] = 1.0
+        
         #for loop done
         env.close()
 
         self.generate_graph(number_of_steps)
 
-        f = open(os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1'), "wb")
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "wb")
         pickle.dump(q,f)
         f.close()
 
-    def deploy(self, render: bool = True, max_steps: int = 500):
+        return policy, q.reshape(-1, 1)
+
+    def deploy(self, render: bool = False, max_steps: int = 500):
         env = gym.make(self.env_id, level_str=self.level_str, render_mode="human" if render else None)
 
         #done training, want the results
-        f = open(os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1'), "rb")
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "rb")
         q = pickle.load(f)
         f.close()
 
@@ -102,15 +114,8 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
         #for loop done
         env.close()
-    
 
 if __name__ == '__main__':
-    agent: ThinIceQLearningAgent = ThinIceQLearningAgent('thin-ice-v0', 'level_6.txt')
-    agent.train(n_episodes=10000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent = ThincIceDynaQAgent('thin-ice-v0', 'level_6.txt')
+    agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.1)
     agent.deploy(render=True)
-    agent.visualize_policy()
-
-
-                      
-
-
