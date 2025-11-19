@@ -14,6 +14,7 @@ from typing import Final
 GRAPHS_FOLDER_NAME: Final[str] = './Graphs_generated/'
 PK_FOLDER_NAME: Final[str] = './PK_generated'
 POLICY_FOLDER_NAME: Final[str] = './Visualized_Policy_generated'
+FINAL_PATH_FOLDER_NAME: Final[str] = './Agent_solutions'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
@@ -50,6 +51,9 @@ class ThinIceTrainingAgent(ABC):
 
     def getPolicyFolderPath(self,algo):
          return os.path.join(os.path.dirname(__file__),POLICY_FOLDER_NAME,algo)
+    
+    def getAgentSolutionsFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),FINAL_PATH_FOLDER_NAME,algo)
     
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)

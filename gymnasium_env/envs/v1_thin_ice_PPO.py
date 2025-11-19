@@ -137,10 +137,11 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
 
                 raw_mask = env.unwrapped.get_available_actions_mask(state)
                 available_actions = env.unwrapped.action_mask_to_actions(raw_mask)
-                print(f"AGENT CAN ONLY GO: {raw_mask}")
-                print(f"WHICH MEANS AGENT CAN ONLY GO {available_actions}")
                 actions_bool = env.unwrapped.get_actions_boolean_list(available_actions)
-                print(f"boolean looks like: {actions_bool}")
+
+                # print(f"AGENT CAN ONLY GO: {raw_mask}")
+                # print(f"WHICH MEANS AGENT CAN ONLY GO {available_actions}")
+                # print(f"boolean looks like: {actions_bool}")
 
                 action_mask = torch.tensor(actions_bool, dtype=torch.bool).unsqueeze(0).to(device)
 
@@ -355,7 +356,6 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
 
         state_dict = torch.load(model_path, map_location=device, weights_only=False)
         self.policy_network.load_state_dict(state_dict)
-
         self.policy_network.eval()
 
         state = env.reset()[0]
@@ -365,15 +365,17 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         
         while not terminated and steps < max_steps:
 
+
+            #get action    
             state_tensor = self.state_index_to_tensor(env, state)
             raw_mask = env.unwrapped.get_available_actions_mask(state)
-            action_mask = [(raw_mask >> i) & 1 == 1 for i in range(env.action_space.n)]
-            action_mask = torch.tensor(action_mask, dtype=torch.bool).unsqueeze(0).to(device)
+            available_actions = env.unwrapped.action_mask_to_actions(raw_mask)
+            actions_bool = env.unwrapped.get_actions_boolean_list(available_actions)
+            action_mask = torch.tensor(actions_bool, dtype=torch.bool).unsqueeze(0).to(device)
 
             with torch.no_grad():
-                probs = self.policy_network.pi(state_tensor, action_mask)
-                dist = torch.distributions.Categorical(probs)
-                action = dist.sample()
+                probs = self.policy_network.pi(state_tensor, action_mask)   
+                action = torch.argmax(probs, dim=-1)
 
             next_state, reward, terminated, _, _ = env.step(action.item())
             total_reward += reward
