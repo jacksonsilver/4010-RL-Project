@@ -1,5 +1,5 @@
 import os
-from v0_thin_ice_QLearning import ThinIceQLearningAgent
+from v0_qlearning import ThinIceQLearningAgent
 from v1_thin_ice_PPO import ThinIcePPOAgent
 
 import contextlib

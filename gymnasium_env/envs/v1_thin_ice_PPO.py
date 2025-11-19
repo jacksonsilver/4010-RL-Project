@@ -78,7 +78,7 @@ class CNNPolicy(nn.Module):
 
 class ThinIcePPOAgent(ThinIceTrainingAgent):
     def __init__(self, env_id='thin-ice-v0', level_str='Level1.txt'):
-        super().__init__(env_id, level_str)
+        super().__init__("PPO", env_id, level_str)
     
     def train(self, gamma=0.99, learning_rate=0.0003, n_episodes=2000):
         print("===== Beginning Training")
@@ -378,7 +378,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
 
             if render and terminated:
                 filename = self.reference_name + f'_agent_final_path.png'
-                filepath = self.getAgentSolutionsFolderPath("PPO")
+                filepath = self.getPkFolderPath("PPO")
                 pygame.image.save(pygame.display.get_surface(), os.path.join(filepath, filename))
 
                 print(f'Created Snapshot of final path: {filename}')
