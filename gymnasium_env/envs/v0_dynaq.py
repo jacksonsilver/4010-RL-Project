@@ -5,65 +5,117 @@ import v0_thin_ice_env as ti #including it so it registers
 import os
 
 from thin_ice_training_agent import ThinIceTrainingAgent
+from components.replay_buffer import ReplayBuffer
 
 class ThincIceDynaQAgent(ThinIceTrainingAgent):
-    '''
-    NEEDS TO BE FURTHER IMPLEMENTED
-    '''
     def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
-        super().__init__(env_id, level_str)
+        super().__init__("DynaQ", env_id, level_str)
     
-    def train(self, gamma=0.99, step_size=0.1, epsilon=0.1, max_episode=1000, max_model_step=10):
+    def train(self, gamma=0.99, step_size=0.1, epsilon=0.1, n_episodes=1000, max_model_step=10):
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str)
 
-        # Initialize q(s,a) and Model(s,a)
-        # q_table = np.random.rand(env.n_states, env.n_actions)
-        q_table = np.random.rand(env.n_states, env.n_actions)
+        # Initialize Q table with random values for n_states x n_actions
+        q = np.random.rand(env.unwrapped.n_states,
+            env.unwrapped.n_actions)
+        # Ensure that goal (terminal) state(s) is initialized to 0
+        targets = env.unwrapped.target
+        q[targets, :] = 0
 
-        # Set Q-values for all goal states to 0
-        for g in env.target:
-            q_table[g] = 0
-            
-        model = {}
+        model = ReplayBuffer(step_size, gamma, max_step=max_model_step)
 
-        for i in range(max_episode):
+        number_of_steps = np.zeros(n_episodes)
+
+        for i in range(n_episodes):
+            print(f'Episode: {i}')
+
             state = env.reset()[0]
-            done = False
-            while not done:
+            terminated = False
+            step_count = 0
+
+            while not terminated:
+                step_count += 1
+
+                # Choose action from state based on epsilon-greedy policy
                 if np.random.rand() < epsilon:
-                    action = np.random.choice(env.n_actions)
+                    # From the state value, get the available actions mask, which is an int where each bit represents an action
+                    available_actions_mask = env.unwrapped.get_available_actions_mask(state)
+
+                    available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
+
+                    # If there are no available actions, choose randomly from all actions
+                    if len(available_actions) == 0:
+                        available_actions = list(range(env.unwrapped.n_actions))
+                    
+                    action = np.random.choice(available_actions)
                 else:
-                    action = np.argmax(q_table[state])
-                next_state, reward, done, _, _ = env.step(action)
-                if not done:
-                    reward -= 0.01
-                if done:
-                    max_next_q = 0
+                    action = np.argmax(q[state])
+                
+                next_state, reward, terminated, truncated, _ = env.step(action)
+
+                if truncated:
+                    terminated = True
+
+                if terminated:
+                    q_target = reward
                 else:
-                    max_next_q = np.max(q_table[next_state])
-                current_q = q_table[state, action]
-                target_value = reward + gamma * max_next_q
-                q_table[state, action] = current_q + step_size * (target_value - current_q)
-                model[(state, action)] = (reward, next_state)
-                # Planning steps
-                for x in range(max_model_step):
-                    if len(model) > 0:
-                        model_keys = list(model.keys())
-                        model_state, model_action = model_keys[np.random.randint(len(model_keys))]
-                        model_reward, model_next_state = model[(model_state, model_action)]
-                        
-                        if model_next_state in env.target:
-                            model_max_next_q = 0
-                        else:
-                            model_max_next_q = np.max(q_table[model_next_state])
-                        model_current_q = q_table[model_state, model_action]
-                        model_target_value = model_reward + gamma * model_max_next_q
-                        q_table[model_state, model_action] = model_current_q + step_size * (model_target_value - model_current_q)
+                    next_action = np.argmax(q[next_state])
+                    q_target = reward + gamma * q[next_state, next_action]
+                
+                q[state, action] = q[state, action] + step_size * (q_target - q[state, action])
+
+                model.UpdateExperiences(state, action, reward, next_state)
+
+                model.UpdateQ(q)
+
                 state = next_state
+            
+            number_of_steps[i] = step_count
 
         policy = np.zeros((env.n_states, env.n_actions))
         for i in range(env.n_states):
-            best_action = np.argmax(q_table[i])
+            best_action = np.argmax(q[i])
             policy[i, best_action] = 1.0
+        
+        #for loop done
+        env.close()
 
-        return policy, q_table.reshape(-1, 1)
+        self.generate_graph(number_of_steps)
+
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "wb")
+        pickle.dump(q,f)
+        f.close()
+
+        return policy, q.reshape(-1, 1)
+
+    def deploy(self, render: bool = False, max_steps: int = 500):
+        env = gym.make(self.env_id, level_str=self.level_str, render_mode="human" if render else None)
+
+        #done training, want the results
+        f = open(os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1'), "rb")
+        q = pickle.load(f)
+        f.close()
+
+        #Reset env before each episode
+        step_count = 0
+        state = env.reset()[0]
+        terminated = False #terminated just means found target
+
+        while (not terminated and step_count < max_steps):
+            step_count += 1
+
+            # Get action from Q table based on state
+            action = np.argmax(q[state])
+
+            # Perform the action
+            new_state,reward,terminated,_,_ = env.step(action)
+            
+            # Update State
+            state = new_state
+
+        #for loop done
+        env.close()
+
+if __name__ == '__main__':
+    agent = ThincIceDynaQAgent('thin-ice-v0', 'level_6.txt')
+    agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent.deploy(render=True)

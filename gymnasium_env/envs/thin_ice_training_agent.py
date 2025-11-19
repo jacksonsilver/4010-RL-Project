@@ -17,10 +17,11 @@ POLICY_FOLDER_NAME: Final[str] = './Visualized_Policy_generated'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
-    def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='level_0.txt'):
+    def __init__(self, algorithm_name:str, env_id: str ='thin-ice-v0', level_str: str ='level_0.txt'):
         self.env_id: str = env_id
         self.level_str: str = level_str
-        self.reference_name: str = self.env_id + "-" + self.level_str.split('.')[0]
+        self.algorithm_name: str = algorithm_name
+        self.reference_name: str = "v" + self.env_id.split('v')[1] + "-" + self.level_str.split('.')[0]
 
     @abstractmethod
     def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
@@ -38,7 +39,7 @@ class ThinIceTrainingAgent(ABC):
         for t in range(n_episodes):
             sum_steps[t] = np.mean(steps_per_episode[max(0,t-100):(t+1)]) #avg step
         plt.plot(sum_steps)
-        path_for_graph = os.path.join(os.path.dirname(__file__), GRAPHS_FOLDER_NAME,"QLearning", graph_name)
+        path_for_graph = os.path.join(self.getGraphFolderPath(self.algorithm_name), graph_name)
         plt.savefig(path_for_graph)
 
     def getPkFolderPath(self,algo):
@@ -46,11 +47,13 @@ class ThinIceTrainingAgent(ABC):
     
     def getGraphFolderPath(self,algo):
          return os.path.join(os.path.dirname(__file__),GRAPHS_FOLDER_NAME,algo)
-    
 
+    def getPolicyFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),POLICY_FOLDER_NAME,algo)
+    
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)
-        q_path = os.path.join(self.getPkFolderPath("QLearning"), self.reference_name + '_solution.pk1')
+        q_path = os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1')
         
         with open(q_path, "rb") as f:
             q = pickle.load(f)
@@ -146,6 +149,6 @@ class ThinIceTrainingAgent(ABC):
         ax.set_yticks(range(max_y))
         ax.grid(True)
         policy_name = self.reference_name + "policy-plot-generated.png"
-        path_for_policy = os.path.join(os.path.dirname(__file__), POLICY_FOLDER_NAME, "QLearning", policy_name)
+        path_for_policy = os.path.join(self.getPolicyFolderPath(self.algorithm_name), policy_name)
         plt.savefig(path_for_policy)
         # plt.show()
