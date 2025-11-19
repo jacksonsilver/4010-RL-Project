@@ -6,6 +6,7 @@ import os
 
 from thin_ice_training_agent import ThinIceTrainingAgent
 from components.replay_buffer import ReplayBuffer
+from components.decaying_epsilon import DecayingEpsilon
 
 class ThincIceDynaQAgent(ThinIceTrainingAgent):
     def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='Level0.txt'):
@@ -22,6 +23,7 @@ class ThincIceDynaQAgent(ThinIceTrainingAgent):
         q[targets, :] = 0
 
         model = ReplayBuffer(step_size, gamma, max_step=max_model_step)
+        decaying_epsilon = DecayingEpsilon(start_epsilon=epsilon, end_epsilon=0.05, decay_rate=5000000)
 
         number_of_steps = np.zeros(n_episodes)
 
@@ -35,20 +37,20 @@ class ThincIceDynaQAgent(ThinIceTrainingAgent):
             while not terminated:
                 step_count += 1
 
+                # From the state value, get the available actions mask, which is an int where each bit represents an action
+                available_actions_mask = env.unwrapped.get_available_actions_mask(state)
+
+                available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
+
+                # If there are no available actions, choose randomly from all actions
+                if len(available_actions) == 0:
+                    available_actions = list(range(env.unwrapped.n_actions))
+
                 # Choose action from state based on epsilon-greedy policy
-                if np.random.rand() < epsilon:
-                    # From the state value, get the available actions mask, which is an int where each bit represents an action
-                    available_actions_mask = env.unwrapped.get_available_actions_mask(state)
-
-                    available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
-
-                    # If there are no available actions, choose randomly from all actions
-                    if len(available_actions) == 0:
-                        available_actions = list(range(env.unwrapped.n_actions))
-                    
+                if np.random.rand() < decaying_epsilon.get_epsilon():                 
                     action = np.random.choice(available_actions)
                 else:
-                    action = np.argmax(q[state])
+                    action = available_actions[np.argmax(q[state, available_actions])]
                 
                 next_state, reward, terminated, truncated, _ = env.step(action)
 
@@ -69,6 +71,7 @@ class ThincIceDynaQAgent(ThinIceTrainingAgent):
 
                 state = next_state
             
+            decaying_epsilon.update(i)
             number_of_steps[i] = step_count
 
         policy = np.zeros((env.n_states, env.n_actions))
@@ -106,6 +109,19 @@ class ThincIceDynaQAgent(ThinIceTrainingAgent):
             # Get action from Q table based on state
             action = np.argmax(q[state])
 
+            # From the state value, get the available actions mask, which is an int where each bit represents an action
+            available_actions_mask = env.unwrapped.get_available_actions_mask(state)
+
+            available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
+
+            # If there are no available actions, choose randomly from all actions
+            if len(available_actions) == 0:
+                available_actions = list(range(env.unwrapped.n_actions))
+            
+            print(available_actions)
+            action = available_actions[np.argmax(q[state, available_actions])]
+            print(action)
+
             # Perform the action
             new_state,reward,terminated,_,_ = env.step(action)
             
@@ -117,5 +133,5 @@ class ThincIceDynaQAgent(ThinIceTrainingAgent):
 
 if __name__ == '__main__':
     agent = ThincIceDynaQAgent('thin-ice-v0', 'level_6.txt')
-    agent.train(n_episodes=1000, step_size=0.1, gamma=1, epsilon=0.1)
+    agent.train(n_episodes=20000, step_size=0.1, gamma=1, epsilon=0.5)
     agent.deploy(render=True)
