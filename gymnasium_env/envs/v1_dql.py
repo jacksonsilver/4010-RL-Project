@@ -8,7 +8,8 @@ import torch.nn.functional as F
 import random
 
 from thin_ice_training_agent import ThinIceTrainingAgent
-import v0_thin_ice_env as ti
+import v1_thin_ice_env as ti
+from components.decaying_epsilon import DecayingEpsilon
 
 # Define model
 class DQN(nn.Module):
@@ -17,7 +18,7 @@ class DQN(nn.Module):
 
         # Define network layers
         self.fc1 = nn.Linear(in_states, h1_nodes)   # first fully connected layer
-        self.out = nn.Linear(h1_nodes, out_actions) # ouptut layer w
+        self.out = nn.Linear(h1_nodes, out_actions) # output layer w
 
     def forward(self, x):
         x = F.relu(self.fc1(x)) # Apply rectified linear unit (ReLU) activation
@@ -41,7 +42,6 @@ class ReplayMemory():
 
 class ThinIceDQLAgent(ThinIceTrainingAgent):
     # Hyperparameters (adjustable)
-    learning_rate_a = 0.001         # learning rate (alpha)
     discount_factor_g = 1         # discount rate (gamma)    
     network_sync_rate = 10          # number of steps the agent takes before syncing the policy and target network
     replay_memory_size = 1000       # size of replay memory
@@ -51,11 +51,11 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
     loss_fn = nn.MSELoss()          # NN Loss function. MSE=Mean Squared Error can be swapped to something else.
     optimizer = None                # NN Optimizer. Initialize later.
 
-    def __init__(self, env_id: str ='thin-ice-v0', level_str: str ='level_1.txt'):
+    def __init__(self, env_id: str ='thin-ice-v1', level_str: str ='level_1.txt'):
         super().__init__("DQL", env_id, level_str)
     
     # Train the FrozeLake environment
-    def train(self, epsilon=0.1, n_episodes=1000):
+    def train(self, epsilon=0.1, step_size = 0.001, n_episodes=1000):
         # Create FrozenLake instance
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str)
         num_states = env.observation_space.n
@@ -71,13 +71,12 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         target_dqn.load_state_dict(policy_dqn.state_dict())
 
         # Policy network optimizer. "Adam" optimizer can be swapped to something else. 
-        self.optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=self.learning_rate_a)
+        self.optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=step_size)
 
         # List to keep track of rewards collected per episode. Initialize list to 0's.
         rewards_per_episode = np.zeros(n_episodes)
 
-        # List to keep track of epsilon decay
-        epsilon_history = []
+        decaying_epsilon = DecayingEpsilon(start_epsilon=epsilon, end_epsilon=0.1, decay_rate=500000)
 
         # Track number of steps taken. Used for syncing policy => target network.
         step_count=0
@@ -87,7 +86,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
             terminated = False
             truncated = False
 
-            print(f"Episode {i+1}/{n_episodes}", end='\r')
+            print(f"Episode {i+1}/{n_episodes}")
 
             while(not terminated and not truncated):
                 # From the state value, get the available actions mask, which is an int where each bit represents an action
@@ -95,12 +94,12 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
 
                 available_actions = env.unwrapped.action_mask_to_actions(available_actions_mask)
 
-                # If there are no available actions, choose randomly from all actions
+                # If there are no available actions, choose randomly from an action that will terminate the episde
                 if len(available_actions) == 0:
-                    available_actions = list(range(env.unwrapped.n_actions))
+                    available_actions = env.unwrapped.get_termination_actions(state)
 
                 # Select action based on epsilon-greedy
-                if np.random.rand() < epsilon:
+                if np.random.rand() < decaying_epsilon.get_epsilon():
                     # select random action
                      action = np.random.choice(available_actions)
                 else:
@@ -131,8 +130,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
                 step_count+=1
 
             # Keep track of the rewards collected per episode.
-            if reward == 1:
-                rewards_per_episode[i] = 1
+            rewards_per_episode[i] = reward
 
             # Check if enough experience has been collected and if at least 1 reward has been collected
             if len(memory)>self.mini_batch_size and np.sum(rewards_per_episode)>0:
@@ -140,8 +138,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
                 self.optimize(mini_batch, policy_dqn, target_dqn)        
 
                 # Decay epsilon
-                # epsilon = max(epsilon - 1/n_episodes, 0)
-                # epsilon_history.append(epsilon)
+                decaying_epsilon.update(episode=i)
 
                 # Copy policy network to target network after a certain number of steps
                 if step_count > self.network_sync_rate:
@@ -153,6 +150,8 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
 
         # Save policy
         torch.save(policy_dqn.state_dict(), "thin_ice_dql.pt")
+
+        return policy_dqn.state_dict(), rewards_per_episode
     
     def optimize(self, mini_batch, policy_dqn, target_dqn):
 
@@ -201,7 +200,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         return input_tensor
 
     # Run the FrozeLake environment with the learned policy
-    def deploy(self, episodes, max_steps=50):
+    def deploy(self, episodes, max_steps=100):
         # Create FrozenLake instance
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str, render_mode='human')
         num_states = env.observation_space.n
@@ -213,11 +212,19 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         policy_dqn.eval()    # switch model to evaluation mode
 
         print('Policy (trained):')
+        self.run_policy(policy_dqn=policy_dqn, env=env, episodes=episodes, max_steps=max_steps)
+    
+    def run_policy(self, policy_dqn, env, episodes=1, max_steps=100):
+        num_states = env.observation_space.n
+
+        visited_tile_percents = []
 
         for i in range(episodes):
             state = env.reset()[0]  # Initialize to state 0
             terminated = False
             truncated = False
+
+            total_visitable_tiles = env.unwrapped.level.get_visitable_tile_count()
 
             steps = 0
             while(not terminated and not truncated):  
@@ -229,7 +236,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
 
                 # If there are no available actions, choose randomly from all actions
                 if len(available_actions) == 0:
-                    available_actions = list(range(env.unwrapped.n_actions))
+                    available_actions = env.unwrapped.get_termination_actions(state)
 
                 # select best action            
                 # with torch.no_grad():
@@ -252,10 +259,59 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
                 # End the episode if it's taking too long (likely didn't train properly)
                 if steps >= max_steps:
                     truncated = True
+            
+            visited_tiles = env.unwrapped.level.get_visited_tile_count()
+            visited_tile_percents.append((visited_tiles / total_visitable_tiles) * 100)
 
         env.close()
+        return visited_tile_percents
+
+    def runDQLtesting(self):
+        def repeatExperiments(self, env, episode, step_size, epsilon):
+            num_states = env.observation_space.n
+            num_actions = env.action_space.n
+            total_visit_percents = []
+            for i in range(n_runs):
+                print("TRAINING")
+                policy_dict, rewards_per_episode = self.train(n_episodes=episode, epsilon=epsilon, step_size=step_size)
+
+                # Load learned policy
+                policy_dqn = DQN(in_states=num_states, h1_nodes=num_states, out_actions=num_actions) 
+                policy_dqn.load_state_dict(policy_dict)
+                policy_dqn.eval()    # switch model to evaluation mode
+
+                print("EVALUATE")
+                visited_tile_percents = self.run_policy(policy_dqn=policy_dqn, env=env)
+                total_visit_percents.extend(visited_tile_percents)
+            
+            return sum(total_visit_percents) / len(total_visit_percents)
+
+
+        env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str, render_mode=None)
+
+        # Go through different episode counts and step sizes to see performance
+        step_sizes = [0.001, 0.0001]
+        episode_counts = [500, 1000, 2000]
+        init_epsilons = [0.1, 0.3, 0.5]
+        n_runs = 3
+
+        results = []
+        i = 0
+
+        for step_size in step_sizes:
+            for episode in episode_counts:
+                for epsilon in init_epsilons:
+                    percent_correct = repeatExperiments(self, env, episode, step_size, epsilon)
+                    results.append(percent_correct)
+        
+        for step_size in step_sizes:
+            for episode in episode_counts:
+                for epsilon in init_epsilons:
+                    percent_correct = results[i]
+                    i += 1
+                    print(f"alpha, episode, epsilon: {step_size}, {episode}, {epsilon}, Avg. Percent Correct: {percent_correct}")
+        
 
 if __name__ == '__main__':
-    thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_12.txt')
-    thin_ice_agent.train(n_episodes=1000, epsilon=0.1)
-    thin_ice_agent.deploy(episodes=3)
+    thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_6.txt')
+    thin_ice_agent.runDQLtesting()
