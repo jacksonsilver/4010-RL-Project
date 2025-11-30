@@ -314,4 +314,8 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
 
 if __name__ == '__main__':
     thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_6.txt')
-    thin_ice_agent.runDQLtesting()
+    thin_ice_agent.train(epsilon=0.1, step_size = 0.001, n_episodes=1000)
+    thin_ice_agent.deploy(episodes=3)
+
+    # LARGE TESTING
+    #thin_ice_agent.runDQLtesting()
