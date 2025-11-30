@@ -69,7 +69,7 @@ def PPO(gamma,lr,n_episodes,level_number,train,saveToLog  = False):
 if __name__ == '__main__':
 
     #Parameters being used
-    n_episodes = 900 #25000 for qlearning, 2000 for PPO
+    n_episodes = 500 #25000 for qlearning, 2000 for PPO
     #3000  for level 4
     #3500  for level 5
     #
@@ -80,10 +80,10 @@ if __name__ == '__main__':
     learning_rate = 0.0003
 
     #Level we are working with
-    level_number = 4
+    level_number = 6
 
-    PPO(gamma,learning_rate,800,level_number,train = True,saveToLog=True)  #train
-    PPO(gamma,learning_rate,800,level_number,train = False)  #deploy
+    PPO(gamma,learning_rate,n_episodes,level_number,train = True,saveToLog=True)  #train
+    PPO(gamma,learning_rate,5,level_number,train = False)  #deploy
     
     '''Algorithms currently implemented'''
 

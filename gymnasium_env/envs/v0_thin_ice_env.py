@@ -138,7 +138,7 @@ class ThinIceEnv(gym.Env):
         reward = 0
         # If player is visiting a new tile, give a reward of 1
         if (self.level.player_position not in self.visited_tiles):
-            reward = 1
+            reward += 1
             self.visited_tiles.add(self.level.player_position)
 
         # Set terminated if target is reached
@@ -153,10 +153,17 @@ class ThinIceEnv(gym.Env):
 
         # If player lands on water tile, end episode and give deinfluencing reward
         if player_tile.tile_type == ti.LevelTileType.WATER:
-            reward = 0
+            reward = -1
             terminated = True
         
         if target_reached:
+            if (len(self.visited_tiles)+1) == self.level.n_visitable_tiles:
+                reward += 10   # big bonus for perfect coverage
+                print('ALL TILES COVERED!')
+            else:
+                reward += 2    # smaller bonus if target reached early
+
+            terminated= True
             print("AGENT REACHED TARGET!!!")
         
         # Debug information

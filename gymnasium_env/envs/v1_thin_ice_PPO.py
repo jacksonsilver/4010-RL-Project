@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import gymnasium as gym
 import pygame
+import math
 
 from thin_ice_training_agent import ThinIceTrainingAgent
 import v0_thin_ice_env as ti
@@ -22,7 +23,7 @@ class Flatten(nn.Module):
         return x.view(x.size(0), -1)
 
 class CNNPolicy(nn.Module):
-    def __init__(self, action_size, num_channels=6, height=15, width=19):
+    def __init__(self, action_size, num_channels=7, height=15, width=19):
         super(CNNPolicy, self).__init__()
 
         # Define activation functions
@@ -79,6 +80,7 @@ class CNNPolicy(nn.Module):
 class ThinIcePPOAgent(ThinIceTrainingAgent):
     def __init__(self, env_id='thin-ice-v0', level_str='level_1.txt'):
         super().__init__("PPO",env_id, level_str)
+        self.total_losses =[]
     
     def train(self, gamma=0.99, learning_rate=0.0003, n_episodes=2000):
         print("===== Beginning Training")
@@ -105,18 +107,23 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         self.eps_clip = 0.2
         self.k_epoch = 10
         self.v_coef = 0.5
-        self.entropy_coef = 0.3  
+
+        entropy_start = 0.5
+        entropy_end   = 0.01
+        decay_rate = 0.001
+
 
 
         #Initializing CNN (neural network of all states)
-        self.policy_network = CNNPolicy(actions,tile_types,rows,cols).to(device)
+        self.policy_network = CNNPolicy(actions,tile_types+2,rows,cols).to(device)
         self.optimizer = torch.optim.Adam(self.policy_network.parameters(), lr=learning_rate)
 
         #rollout buffer -> keep track of everything
         self.memory = {
             'state': [], 'action': [], 'reward': [], 'next_state': [],
             'action_prob': [], 'terminated': [], 'count': 0,
-            'advantage': [], 'td_target': torch.FloatTensor([])
+            'advantage': [], 'td_target': torch.FloatTensor([]),
+            'mask':[]
         }
 
         prev_len = 0
@@ -125,6 +132,9 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         #training loop
         for i in range(n_episodes):
             print(f'============== EPISODE {i} ==============')
+            progress = 1/n_episodes
+            self.entropy_coef = entropy_end + (entropy_start - entropy_end) * math.exp(-decay_rate * i)
+
 
             state = env.reset()[0]
             terminated = False
@@ -165,7 +175,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                     episode_reward -=1 
                     env.render()
                     pygame.quit()
-                    self.add_to_memory(state_tensor, torch.tensor([0]), reward, state_tensor, 0.0, terminated)
+                    #self.add_to_memory(state_tensor, torch.tensor([0]), reward, state_tensor, 0.0, terminated,action_mask)
                     break
                 
                 else:
@@ -180,7 +190,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                     episode_reward += reward
 
                     #store values
-                    self.add_to_memory(state_tensor,action,reward,next_state_tensor,action_prob,terminated)
+                    self.add_to_memory(state_tensor,action,reward,next_state_tensor,action_prob,terminated,action_mask)
 
                     #updating states
                     state_tensor = next_state_tensor
@@ -219,7 +229,8 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         # print(f'number of cols {self.cols}')
         # print(f'END [DEBUG]')
 
-        tensor = torch.zeros(self.tile_types,self.rows,self.cols)
+        tensor = torch.zeros(self.tile_types+2,self.rows,self.cols)
+
 
         #fill in values
         for j in range(self.rows):
@@ -227,13 +238,18 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                 tile = env.unwrapped.level.get_tile((i,j))
                 tile_type = tile.tile_type.value
                 tensor[tile_type,j,i] = 1.0
+
+        visited_channel = self.tile_types  # the extra channel index
+        for (vx, vy) in env.unwrapped.visited_tiles:
+            tensor[visited_channel, vy, vx] = 1.0
         
         #player position in last channel
-        tensor[-1,y,x] = 1.0
+        player_channel = self.tile_types + 1
+        tensor[player_channel, y, x] = 1.0
 
         return tensor.unsqueeze(0) #shape [1,C,H,W]
     
-    def add_to_memory(self,s,a,r,next_s,prob,terminated):
+    def add_to_memory(self,s,a,r,next_s,prob,terminated,mask):
 
         #s & next_s are tensors
         self.memory['state'].append(s.squeeze(0))  
@@ -242,6 +258,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         self.memory['next_state'].append(next_s.squeeze(0))
         self.memory['action_prob'].append(prob)
         self.memory['terminated'].append(terminated)
+        self.memory['mask'].append(mask.squeeze(0))
 
     def compute_target_and_advantages(self,length):
         states = torch.stack(self.memory['state'][-length:]).to(device)
@@ -270,6 +287,8 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
             gae = delta + self.gamma * self.lmbda * (1 - terminals[t]) * gae
             advantages[t] = gae.view(-1)[0]
 
+       # advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+
         self.memory['advantage'] = advantages
         self.memory['td_target'] = td_target.unsqueeze(1)
     
@@ -284,13 +303,15 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         states_tensor  = torch.stack(self.memory['state'][start:end]).to(device)         # [L, C, H, W]
         actions_tensor = torch.stack(self.memory['action'][start:end]).long().to(device).view(-1,1)  # [L,1]
         old_probs      = torch.tensor(self.memory['action_prob'][start:end], dtype=torch.float32, device=device).view(-1)  # [L]
+        masks_tensor =   torch.stack(self.memory['mask'][start:end]).to(device)# [L, A]
+
 
         # These were already saved for just the last `length` steps — don't slice again
         advantages = torch.as_tensor(self.memory['advantage'], dtype=torch.float32, device=device).view(-1)  # [L]
         td_target  = self.memory['td_target'].to(device).view(-1)                                           # [L]
 
         for _ in range(self.k_epoch):
-            pi   = self.policy_network.pi(states_tensor)                 # [L, A]
+            pi   = self.policy_network.pi(states_tensor,masks_tensor)                 # [L, A]
             newp = torch.gather(pi, 1, actions_tensor).squeeze(1)        # [L]
             ratio = newp / (old_probs + 1e-8)
 
@@ -304,11 +325,12 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
             entropy = torch.distributions.Categorical(pi).entropy().mean()
 
             loss = policy_loss + self.v_coef * value_loss - self.entropy_coef * entropy
+            self.total_losses.append(loss.item())
             self.optimizer.zero_grad(); loss.backward(); self.optimizer.step()
             if hasattr(self, 'scheduler'): self.scheduler.step()
 
         # Clear the right keys
-        for k in ['state','action','reward','next_state','terminated','action_prob','advantage']:
+        for k in ['state','action','reward','next_state','terminated','action_prob','advantage','mask']:
             self.memory[k] = []
         self.memory['td_target'] = torch.FloatTensor([]).to(device)
 
@@ -321,12 +343,14 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                 ema.append(alpha * reward + (1 - alpha) * ema[-1])
         return ema
 
-    def plot_graph(self,rewards):
+    def plot_graph(self,rewards,):
         ema_rewards = self.exponential_moving_average(rewards, alpha=0.05)
 
         plt.figure(figsize=(10, 5))
+
         plt.plot(range(len(rewards)), rewards, alpha=0.3, label='Raw Reward')
         plt.plot(range(len(ema_rewards)), ema_rewards, color='blue', linewidth=2, label='Smoothed Reward (EMA)')
+       
         plt.xlabel('Episode')
         plt.ylabel('Reward')
         plt.title('Agent Learning Curve')
@@ -334,9 +358,24 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         plt.legend()
 
         path = self.getGraphFolderPath('PPO')
-        filename = self.reference_name + '-graph.png'
+        filename = self.reference_name + '-reward-graph.png'
         plt.savefig(os.path.join(path, filename))
         print(f'Generated Graph: {filename}')
+
+        # ----- LOSS CURVE -----
+        if len(self.total_losses) > 0:
+            plt.figure(figsize=(10,5))
+            plt.plot(self.total_losses, color='red', linewidth=2, label='Total PPO Loss')
+            plt.xlabel("Episode")
+            plt.ylabel("Loss")
+            plt.title("PPO Loss Curve")
+            plt.grid(True)
+            plt.legend()
+
+            filename = self.reference_name + "-loss-graph.png"
+            plt.savefig(os.path.join(path, filename))
+            print(f"Generated Loss Graph: {filename}")
+
 
 
     def deploy(self, render=True, max_steps=500):
@@ -349,7 +388,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         self.cols = cols = env.unwrapped.level.n_cols
 
         # Load trained policy
-        self.policy_network = CNNPolicy(actions, tile_types, rows, cols).to(device)
+        self.policy_network = CNNPolicy(actions, tile_types+2, rows, cols).to(device)
         path = self.getPkFolderPath('PPO')
         filename = self.reference_name + '_solution.pt'
         model_path = os.path.join(path,filename)
@@ -372,10 +411,15 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
             available_actions = env.unwrapped.action_mask_to_actions(raw_mask)
             actions_bool = env.unwrapped.get_actions_boolean_list(available_actions)
             action_mask = torch.tensor(actions_bool, dtype=torch.bool).unsqueeze(0).to(device)
+            print(action_mask)
 
             with torch.no_grad():
                 probs = self.policy_network.pi(state_tensor, action_mask)   
                 action = torch.argmax(probs, dim=-1)
+            
+            if not action_mask.any(): 
+                terminated = True
+                break
 
             next_state, reward, terminated, _, _ = env.step(action.item())
             total_reward += reward
