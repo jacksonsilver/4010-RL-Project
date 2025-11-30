@@ -293,19 +293,19 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         step_sizes = [0.001, 0.0001]
         episode_counts = [500, 1000, 2000]
         init_epsilons = [0.1, 0.3, 0.5]
-        n_runs = 3
+        n_runs = 1
 
         results = []
         i = 0
 
-        for step_size in step_sizes:
-            for episode in episode_counts:
+        for episode in episode_counts:
+            for step_size in step_sizes:
                 for epsilon in init_epsilons:
                     percent_correct = repeatExperiments(self, env, episode, step_size, epsilon)
                     results.append(percent_correct)
-        
-        for step_size in step_sizes:
-            for episode in episode_counts:
+
+        for episode in episode_counts:    
+            for step_size in step_sizes:
                 for epsilon in init_epsilons:
                     percent_correct = results[i]
                     i += 1
@@ -314,8 +314,8 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
 
 if __name__ == '__main__':
     thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_6.txt')
-    thin_ice_agent.train(epsilon=0.1, step_size = 0.001, n_episodes=1000)
-    thin_ice_agent.deploy(episodes=3)
+    # thin_ice_agent.train(epsilon=0.1, step_size = 0.001, n_episodes=1000)
+    # thin_ice_agent.deploy(episodes=3)
 
     # LARGE TESTING
-    #thin_ice_agent.runDQLtesting()
+    thin_ice_agent.runDQLtesting()
