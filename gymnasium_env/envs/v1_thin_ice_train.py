@@ -14,15 +14,14 @@ from stable_baselines3 import DQN
 from stable_baselines3.dqn.policies import DQNPolicy, QNetwork
 from stable_baselines3.common.policies import BasePolicy
 
-from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.utils import get_linear_fn
 from stable_baselines3.common.noise import ActionNoise 
 
-from .thin_ice_training_agent import ThinIceTrainingAgent 
-from . import v1_thin_ice_env as ti
+from gymnasium_env.envs.thin_ice_training_agent import ThinIceTrainingAgent
 
 PATH_TO_LEVELS: Final[str] = './level_txt_files/'
 
@@ -161,7 +160,7 @@ class MaskableDQN(DQN):
 
 class ThinIceDQNAgent(ThinIceTrainingAgent):
     def __init__(self, env_id: str ='thin-ice-v1', level_str: str = 'level_0.txt', level_list: list[str] = None):
-        super().__init__(env_id, level_str)
+        super().__init__('DQN', env_id, level_str)
         self.env_id = env_id
         self.level_list = level_list
         self.level_str = level_str
@@ -171,7 +170,7 @@ class ThinIceDQNAgent(ThinIceTrainingAgent):
 
         else:
             self.reference_name = f"{self.env_id}-DQN-{self.level_str.split('.')[0]}-Masked"
-        self.model_path = os.path.join(self.getPkFolderPath(), self.reference_name + '_model.zip')
+        self.model_path = os.path.join(self.getPkFolderPath('DQN'), self.reference_name + '_model.zip')
 
     def train(self, total_timesteps: int = 100_000, start_learning_rate: float = 1e-4, end_learning_rate: float = 1e-5, gamma: float = 0.99, num_cpu: int = 4, **kwargs):
 
@@ -191,7 +190,7 @@ class ThinIceDQNAgent(ThinIceTrainingAgent):
             env_kwargs['level_str'] = self.level_str
             print(f"Training on single level: {self.level_str}")
 
-        env = make_vec_env(self.env_id, n_envs=num_cpu, seed=0, vec_env_cls=SubprocVecEnv, env_kwargs=env_kwargs)
+        env = make_vec_env(self.env_id, n_envs=num_cpu, seed=0, vec_env_cls=DummyVecEnv, env_kwargs=env_kwargs)
 
         policy_kwargs = dict(
             features_extractor_class=CustomCNN,

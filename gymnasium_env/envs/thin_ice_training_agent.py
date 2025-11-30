@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import gymnasium as gym
-import v0_thin_ice as ti
+from gymnasium_env.envs import v1_thin_ice_env as ti
 import matplotlib.patches as mpatches
 
 from typing import Final
