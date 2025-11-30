@@ -1,8 +1,9 @@
 \documentclass{article}
 \usepackage[preprint]{neurips} 
 \usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} 
 
-\title{Reinforcement Learning for Thin Ice} 
+\title{COMP 4010: Reinforcement Learning for Thin Ice} 
 \author{
     Alexis Udechukwu\\101225811 \and 
     Lujain Sharafeldin\\101246804\and
@@ -17,15 +18,45 @@
 \maketitle
 
 \section{Introduction}
-
 \subsection{Problem Focus}
 This project will focus on solving the puzzle game "Thin Ice" from Club Penguin using Reinforcement Learning. Thin Ice is a grid-based game where a player navigates a maze to  reach a target tile. A unique aspect of the game that adds more technicality is that each floor tile melts when stepped on, preventing tiles from being revisited and forcing the player to think carefully about the path they take to reach the target tile. 
 Our main goal is to train an RL agent to complete the different Thin Ice levels we have provided by reaching the target tile without drowning. Our agent can move in four directions: up, down, left, and right. We have different tiles in the environment: floor tiles (which the agent can walk on), wall tiles (which block movement), water tiles (which floor tiles turn into when stepped on by the agent and cause the agent to drown when the tile is revisited), and a target tile (the goal tile). In addition to reaching the target tile, we make our project more challenging by having another goal for our agent. In Thin Ice, players get the highest score by stepping on every floor tile on their path to the destination. This feature increases the complexity of the task and provides an environment that's better suited for studying reinforcement learning algorithms.
 
 \subsection{Why Should We Care About This Problem?}
-Thin Ice has simple rules but has challenges that make it a good environment for studying reinforcement learning. Since each tile melts after being stepped on, the agent must be trained to find paths that reach the target tile without revisiting tiles. This allows the task at hand to become similar to finding a Hamiltonian path,  where each tile is visited once. Working on Thin Ice will give us a chance to see how RL can deal with limited choices, deal with risks and discover paths that paths that cover a whole space, making this project useful both for learning about RL in theory and for applying it to practical applications.
+Thin Ice has simple rules, but it has challenges that make it a suitable environment for studying reinforcement learning. Since each tile melts after being stepped on, the agent must be trained to find paths that reach the target tile without revisiting tiles. This allows the task at hand to be similar to finding a Hamiltonian path, where each tile is visited exactly once. Working on Thin Ice will give us a chance to see how RL can deal with limited choices, deal with risks and discover paths that cover a whole space, making this project useful both for learning about RL in theory and for applying it to practical applications.
 
-\subsection{MDP Specifications}
+\subsection{MDP Specifications} (HAVE TO REVIEW THIS)
+The action space for the Thin Ice environment consists of four deterministic moves: Left, Down, Right, and Up. Each state is encoded as a tuple (Tile’s X-coordinate: int, Tile’s Y-coordinate: int, AVAIL-ACTION-mask: int). The coordinates identify the tile the agent occupies and the AVAIL-ACTION-mask represent what actions are available for the agent to take at the tile. The mask is interpreted in four-bit binary, for example, AVAIL-ACTION-mask = 3 would correspond to 0011 in binary form which means the agent can only go Right or Up. There are 15 rows and 19 columns for the grid, so the total number of possible states is $|rows| \times |columns| \times |AVAIL\text{-}ACTION\text{-}mask|$. The implementation removes states that can never occur, such as with walls and blanks, and action masks associated with those tiles. In total, the number of states is below 4320.
+If the agent steps onto a water tile, the reward is zero. If the agent remains on the tile, a negative reward is given. Otherwise, the reward is the number of unique tiles visited thus far divided by the total number of visitable tiles.
+Transitions are also deterministic as the new (x, y) position is the combination of the current position plus the chosen action. And the AVAIL-ACTION-mask for the next state simply reflects which of the four moves are allowed from that new tile.
 
+
+\section{Approach(es)}
+\subsection{Review of Prior Work on this Problem}
+Reinforcement learning has been widely applied to maze-solving and navigation problems, and several prior works provide a foundation for the methods used in our project. Classic tabular Q-learning has been one of the most commonly adopted approaches due to its ability to map individual state–action pairs to expected returns. One representative study applied Q-learning to the classic Frozen Lake environment, experimenting with both a simple 4×4 grid and a more complex 8×8 version on environments like Frozen Lake. In this study, the agent must learn to reach the goal while avoiding holes, and performance depends heavily on how well the exploration–exploitation tradeoff is managed. The study demonstrated that without sufficient exploration, Q-values become biased early, preventing the agent from discovering alternative paths or better strategies. And that incorporating an exploration–exploitation strategy not only prevents Q-values from becoming prematurely biased, but also significantly speeds up the training process, especially when exponential decay is used [1]. This directly carries over to the Thin Ice game, where the agent must not only reach the goal but must also maximize the number of unique tiles it visits, which is an exploration-heavy task. EXPAND MORE...
+ 
+\subsection{Approaches \& Justification}
+Our project implements QLearning, Deep Q Networks (DQN), and Proximal Policy Optimization (PPO) algorithms. We started with tabular QLearning since it is the most basic and easy-to-understand approach. QLearning stores a value for every state–action pair, allowing us to see exactly how the agent learns. This worked well for small maps, but Thin Ice levels quickly become too large for a Q-table, and the agent struggles when there are many tiles and only one reward at the end. QLearning also depends heavily on exploration, and without it the agent becomes greedy too early and fails to discover longer paths. These limitations motivated us to move beyond this method.
+
+Next, we implemented DQN to handle larger and more complex state spaces. Instead of storing all values in a table, DQN uses a neural network to estimate Q-values which allows the agent to generalize across many different tile configurations. This is important in Thin Ice, where the agent must consider both its position and which tiles have already been melted. We also added action masking so the agent never selects an illegal move. 
+
+Finally, we used PPO, a modern policy-gradient algorithm known for stable learning. PPO directly learns a policy rather than estimating Q-values. This is especially useful in Thin Ice because the goal is not just to reach the exit, but to take the longest possible path first.
+
+\section{Empirical Studies}
+\subsection{Comparison of Approaches}
+\subsection{Results}
+
+\section{Conclusion}
+\subsection{Reflection}
+\subsection{Possible Improvements}
+
+
+
+\section{References}
+[1] Gunady, M. K., & Gomaa, W. (2012). Reinforcement learning generalization using state aggregation with a maze-solving problem. 2012 Japan-Egypt Conference on Electronics, Communications and Computers, 157–162. https://doi.org/10.1109/jec-ecc.2012.6186975
+
+[2] Xu, C. (2023). Maze solving problem using q-learning. Applied and Computational Engineering, 6(1), 1491–1497. https://doi.org/10.54254/2755-2721/6/20230909
+
+‌
 
 \end{document}
