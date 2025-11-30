@@ -10,15 +10,18 @@ import matplotlib.patches as mpatches
 
 from typing import Final
 
-GRAPHS_FOLDER_NAME: Final[str] = './graphs_generated/'
-PK_FOLDER_NAME: Final[str] = './pk_files_generated'
+#base folders
+GRAPHS_FOLDER_NAME: Final[str] = './Graphs_generated/'
+PK_FOLDER_NAME: Final[str] = './PK_generated'
+POLICY_FOLDER_NAME: Final[str] = './Visualized_Policy_generated'
 
 # An interface for training agents on Thin Ice Environment
 class ThinIceTrainingAgent(ABC):
-    def __init__(self, env_id: str ='thin-ice-v1', level_str: str ='level_0.txt'):
+    def __init__(self, algorithm_name:str, env_id: str ='thin-ice-v0', level_str: str ='level_0.txt'):
         self.env_id: str = env_id
         self.level_str: str = level_str
-        self.reference_name: str = self.env_id + "-" + self.level_str.split('.')[0]
+        self.algorithm_name: str = algorithm_name
+        self.reference_name: str = "v" + self.env_id.split('v')[1] + "-" + self.level_str.split('.')[0]
 
     @abstractmethod
     def train(self, gamma: float = 0.9, step_size: float = 0.1, epsilon: float = 0.1, n_episodes: int = 1000):
@@ -36,23 +39,27 @@ class ThinIceTrainingAgent(ABC):
         for t in range(n_episodes):
             sum_steps[t] = np.mean(steps_per_episode[max(0,t-100):(t+1)]) #avg step
         plt.plot(sum_steps)
-        path_for_graph = os.path.join(os.path.dirname(__file__), GRAPHS_FOLDER_NAME, graph_name)
+        path_for_graph = os.path.join(self.getGraphFolderPath(self.algorithm_name), graph_name)
         plt.savefig(path_for_graph)
 
-    def getPkFolderPath(self):
-        return os.path.join(os.path.dirname(__file__),PK_FOLDER_NAME)
+    def getPkFolderPath(self,algo):
+        return os.path.join(os.path.dirname(__file__),PK_FOLDER_NAME,algo)
     
+    def getGraphFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),GRAPHS_FOLDER_NAME,algo)
 
+    def getPolicyFolderPath(self,algo):
+         return os.path.join(os.path.dirname(__file__),POLICY_FOLDER_NAME,algo)
+    
     def visualize_policy(self):
         env = gym.make(self.env_id, level_str=self.level_str)
-        q_path = os.path.join(self.getPkFolderPath(), self.reference_name + '_solution.pk1')
-
+        q_path = os.path.join(self.getPkFolderPath(self.algorithm_name), self.reference_name + '_solution.pk1')
+        
         with open(q_path, "rb") as f:
             q = pickle.load(f)
 
-        to_cell = env.unwrapped._to_cell  #(x, y, w_mask, avail_mask)
+        to_cell = env.unwrapped._to_cell  #(x, y, avail_mask)
         n_states = env.unwrapped.n_states
-        n_actions = env.unwrapped.n_actions
 
         #Get map bounds
         max_x = env.unwrapped.level.n_cols
@@ -64,24 +71,28 @@ class ThinIceTrainingAgent(ABC):
         ax.set_ylim(-0.5, max_y - 0.5)
         ax.set_aspect('equal')
 
+        visited_tiles = set()
+        state = env.reset()[0]
+        terminated = False
+        step_count = 0
+        max_steps = 500  #prevent infinite loop
+
+        #Get visited tiles to draw arrows on plot
+        while not terminated and step_count < max_steps:
+            step_count += 1
+            x, y, _ = to_cell[state]
+            visited_tiles.add((x, y))
+            action = np.argmax(q[state])
+            state, reward, terminated, _, _ = env.step(action)
+            env.close()
+
         start_pos = env.unwrapped.level.player_start
         goal_pos = env.unwrapped.level.target 
-
-        #Find states that correspond to start_pos and goal_pos
-        start_states = [s for s in range(n_states) if to_cell[s][0:2] == start_pos]
-        goal_states = [s for s in range(n_states) if to_cell[s][0:2] == goal_pos]
-
-        #Pick the first matching state
-        start_state = start_states[0] if start_states else None
-        goal_state = goal_states[0] if goal_states else None
-
-        start_x, start_y = to_cell[start_state][0:2]
-        goal_x, goal_y = to_cell[goal_state][0:2]
 
         best_action_per_cell = {}
 
         for state in range(n_states):
-            x, y, w_mask, avail_mask = to_cell[state]
+            x, y, avail_mask = to_cell[state]
 
             if avail_mask == 0: #Skip blocked cells
                 continue
@@ -91,7 +102,7 @@ class ThinIceTrainingAgent(ABC):
 
             #Only keep the highest Q-value for each (x, y)
             if (x, y) not in best_action_per_cell or best_value > best_action_per_cell[(x, y)][1]:
-                best_action_per_cell[(x, y)] = (best_action, best_value, w_mask)
+                best_action_per_cell[(x, y)] = (best_action, best_value)
 
         #Get tiles for walls
         for row in env.unwrapped.level.tiles:
@@ -101,7 +112,11 @@ class ThinIceTrainingAgent(ABC):
                     plot_y = max_y - tile_y - 1
                     ax.add_patch(plt.Rectangle((tile_x - 0.5, plot_y - 0.5), 1, 1, color='black')) # Draw obstacle
 
-        for (x, y), (best_action, _, w_mask) in best_action_per_cell.items():
+        for (x, y), (best_action, _) in best_action_per_cell.items():
+
+            if visited_tiles and (x, y) not in visited_tiles:
+                continue
+
             plot_y = max_y - y - 1
 
             #Draw start/goal
@@ -133,4 +148,7 @@ class ThinIceTrainingAgent(ABC):
         ax.set_xticks(range(max_x))
         ax.set_yticks(range(max_y))
         ax.grid(True)
-        plt.show()
+        policy_name = self.reference_name + "policy-plot-generated.png"
+        path_for_policy = os.path.join(self.getPolicyFolderPath(self.algorithm_name), policy_name)
+        plt.savefig(path_for_policy)
+        # plt.show()

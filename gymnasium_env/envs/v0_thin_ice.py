@@ -4,6 +4,20 @@ from typing import Final
 
 PATH_TO_LEVELS: Final[str] = './level_txt_files/'
 
+def set_bit(number, position):
+  """
+  Sets the bit at the given position in a number to 1.
+
+  Args:
+    number: The integer in which to set the bit.
+    position: The 0-indexed position of the bit to set.
+
+  Returns:
+    The new number with the bit at the specified position set to 1.
+  """
+  mask = 1 << position
+  return number | mask
+
 # The actions that the player is capable of doing
 class PlayerActions(Enum):
     LEFT = 0
@@ -149,7 +163,7 @@ class Level:
             print("Invalid move to ", new_pos)
         
         # Return if target reached and if player successfully moved
-        return np.array_equal(self.player_position, self.target), np.array_equal(self.player_position, new_pos)
+        return np.array_equal(self.player_position, self.target)
     
     def get_available_actions(self, tile: Tile) -> int:
         # Return a 4-bit mask (as int) where bit i corresponds to PlayerActions with value i
@@ -161,7 +175,7 @@ class Level:
 
             # If action is available (not out of bounds and not wall or water), set the corresponding bit
             if new_tile is not None and new_tile.tile_type not in (LevelTileType.WALL, LevelTileType.WATER):
-                mask |= (1 << action.value)
+                mask = set_bit(mask, len(PlayerActions) - 1 - action.value)
 
         return mask
     

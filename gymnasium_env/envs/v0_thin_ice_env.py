@@ -4,18 +4,20 @@ COMP4010 Project - Custom Gym Environment for Thin Ice
 import gymnasium as gym
 from gymnasium import spaces
 from gymnasium.envs.registration import register
+from gymnasium.envs.registration import registry
 from gymnasium.utils.env_checker import check_env
 
-import v0_thin_ice as ti
+import gymnasium_env.envs.v0_thin_ice as ti
 import numpy as np
 import pygame
 import os
 
 #Register -> to be able to use it as ID
-register(
-    id='thin-ice-v0', # unique id for the environment
-    entry_point='gymnasium_env.envs:ThinIceEnv', # module_name:class_name
-)
+if 'thin-ice-v0' not in registry:
+    register(
+        id='thin-ice-v0', # unique id for the environment
+        entry_point='gymnasium_env.envs:ThinIceEnv', # module_name:class_name
+    )
 
 class ThinIceEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 2}
@@ -39,33 +41,21 @@ class ThinIceEnv(gym.Env):
                 if tile.tile_type not in [ti.LevelTileType.FLOOR, ti.LevelTileType.WATER, ti.LevelTileType.TARGET]:
                     continue
 
-                # water_options determines the possible values in the state representation for the water mask
-                water_options = []
-                if tile.tile_type == ti.LevelTileType.FLOOR:
-                    water_options = [ti.LevelTileType.FLOOR.get_water_mask(), ti.LevelTileType.WATER.get_water_mask()]
-                else:
-                    water_options = [tile.tile_type.get_water_mask()]
-
                 # Compute available actions mask for this tile (4-bit integer)
                 avail_mask = self._level.get_available_actions(tile)
+                all_possible_masks = self.get_all_possible_masks(avail_mask)
 
-                # for each water option and for each submask of avail_mask, create a state
-                # For example, if the avail_mask was 1010, this would create submasks of 1010, 0010, 1000, and 0000.
-                for wmask in water_options:
-                    sub = avail_mask
-                    while True:
-                        key = tile.position + (wmask, sub)
-                        # map key to state number
-                        self._to_state[key] = state_num
+                # For each submask of avail_mask, create a state
+                # For example, if the avail_mask was 1010, this would create submasks of 1010, 0010, 1000, and 0000
+                for a_mask in all_possible_masks:
+                    key = tile.position + (a_mask,)
+                    # map key to state number
+                    self._to_state[key] = state_num
 
-                        # include this state index in the list of target states if the tile is a TARGET
-                        if tile.tile_type == ti.LevelTileType.TARGET:
-                            self._target.append(state_num)
-                        
-                        state_num += 1
-                        if sub == 0:
-                            break
-                        sub = (sub - 1) & avail_mask
+                    # include this state index in the list of target states if the tile is a TARGET
+                    if tile.tile_type == ti.LevelTileType.TARGET:
+                        self._target.append(state_num)
+                    state_num += 1
 
         self._to_cell = {v: k for k, v in self._to_state.items()}  # maps state # to (x, y)
 
@@ -121,15 +111,17 @@ class ThinIceEnv(gym.Env):
         # Reset environment, level, and visited tiles
         super().reset(seed=seed)
         self.level.reset()
-        self.visited_tiles = set()
 
         # Determine initial state
         player_position = self.level.player_position
         player_tile = self.level.get_tile(player_position)
-        water_mask = player_tile.tile_type.get_water_mask()
         avail_mask = self.level.get_available_actions(player_tile)
         # Set next state in observation
-        obs = self._to_state[player_position + (water_mask, avail_mask)]
+        obs = self._to_state[player_position + (avail_mask,)]
+
+        # Reset visited tiles to be just the current position
+        self.visited_tiles = set()
+        self.visited_tiles.add(player_position)
 
         # Debug information
         info = {} 
@@ -141,12 +133,13 @@ class ThinIceEnv(gym.Env):
 
     def step(self, action):
         # Perform action
-        target_reached, position_changed = self.level.perform_action(ti.PlayerActions(action))
+        target_reached = self.level.perform_action(ti.PlayerActions(action))
 
-        # Determine reward
-        self.visited_tiles.add(self.level.player_position)
-        reward = len(self.visited_tiles) / self.level.n_visitable_tiles if position_changed else 0
-        reward = reward + 1 if target_reached else reward
+        reward = 0
+        # If player is visiting a new tile, give a reward of 1
+        if (self.level.player_position not in self.visited_tiles):
+            reward = 1
+            self.visited_tiles.add(self.level.player_position)
 
         # Set terminated if target is reached
         terminated = target_reached
@@ -154,10 +147,9 @@ class ThinIceEnv(gym.Env):
         # Determine next state
         player_position = self.level.player_position
         player_tile = self.level.get_tile(player_position)
-        water_mask = player_tile.tile_type.get_water_mask()
         avail_mask = self.level.get_available_actions(player_tile)
         # Set next state in observation
-        obs = self._to_state[player_position + (water_mask, avail_mask)]
+        obs = self._to_state[player_position + (avail_mask,)]
 
         # If player lands on water tile, end episode and give deinfluencing reward
         if player_tile.tile_type == ti.LevelTileType.WATER:
@@ -254,6 +246,29 @@ class ThinIceEnv(gym.Env):
     @property
     def to_cell(self):
         return self._to_cell
+    
+    def get_available_actions_mask(self, state_num: int):
+        state_rep = self.to_cell[state_num]
+        return state_rep[2]
+    
+    @staticmethod
+    def get_all_possible_masks(available_action_mask: int) -> list[int]:
+        possible_masks = []
+        sub = available_action_mask
+        while True:
+            possible_masks.append(sub)
+            if sub == 0:
+                break
+            sub = (sub - 1) & available_action_mask
+        return possible_masks
+    
+    @staticmethod
+    def action_mask_to_actions(action_mask) -> list[int]:
+        available_actions = []
+        for action in ti.PlayerActions:
+            if ((action_mask >> (len(ti.PlayerActions) -1 - action.value)) & 1):
+                available_actions.append(action.value)
+        return available_actions
 
 
 # Run to test the environment
