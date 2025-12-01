@@ -9,7 +9,7 @@ Jackson
 
 
 Kinjal
-
+- Updated the final report to mainly include text on approaches, review of prior work on algorithms, and justification of these approaches
 
 Lujain
 
@@ -20,3 +20,4 @@ Trista
 Main Accomplishment: 
 
 Goals for next 2 weeks: 
+
