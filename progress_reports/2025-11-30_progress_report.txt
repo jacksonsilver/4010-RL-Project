@@ -22,7 +22,8 @@ Lujain
 - Tested with different reward structures to see how it effects training
 
 Trista
-
+- Investigate flattening CNN since the only layer that matters is the water/ice layer
+- Reduce load on computer with dummy vectorized envs over subprocesses
 
 Main Accomplishment: 
 
@@ -30,4 +31,5 @@ Goals for this week:
 - Compare algorithms correctness, and on different training values.
 - Create faster testing for DQL (current testing is too slow, use subprocesses)
 - Add findings to report
+
 
