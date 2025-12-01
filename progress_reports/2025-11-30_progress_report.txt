@@ -6,7 +6,10 @@ Alexis
 
 
 Jackson
-
+- Added DQL Algorithm
+- Added level with hard ice - tile that can be walked on more than once
+- Modified MDP to accomodate hard ice - state representation is x, y, and the tile types of the 3x3 grid surrounding player
+- Implemented comparison of DQL algorithm with different training values
 
 Kinjal
 - Updated the final report to mainly include text on approaches, review of prior work on algorithms, and justification of these approaches
@@ -20,4 +23,7 @@ Trista
 Main Accomplishment: 
 
 Goals for next 2 weeks: 
+- Compare algorithms correctness, and on different training values.
+- Create faster testing for DQL (current testing is too slow, use subprocesses)
+- Add findings to report
 
