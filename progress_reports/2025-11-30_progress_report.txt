@@ -15,14 +15,17 @@ Kinjal
 - Updated the final report to mainly include text on approaches, review of prior work on algorithms, and justification of these approaches
 
 Lujain
-
+- Generated loss graph for training, to make sure loss decreases as training goes on
+- Implemented a decaying entropy, so that it converges at the end, and not too early
+- Debugging PP
+- Tested with different reward structures to see how it effects training
 
 Trista
 
 
 Main Accomplishment: 
 
-Goals for next 2 weeks: 
+Goals for this week:
 - Compare algorithms correctness, and on different training values.
 - Create faster testing for DQL (current testing is too slow, use subprocesses)
 - Add findings to report
