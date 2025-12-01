@@ -2,7 +2,6 @@ import numpy as np
 
 def DynaQ(env, gamma=0.99, step_size=0.1, epsilon=0.1, max_episode=1000, max_model_step=10):
     # Initialize q(s,a) and Model(s,a)
-    # q_table = np.random.rand(env.n_states, env.n_actions)
     q_table = np.random.rand(env.n_states, env.n_actions)
     
     # Set Q-values for all goal states to 0
@@ -45,7 +44,7 @@ def DynaQ(env, gamma=0.99, step_size=0.1, epsilon=0.1, max_episode=1000, max_mod
                     model_target_value = model_reward + gamma * model_max_next_q
                     q_table[model_state, model_action] = model_current_q + step_size * (model_target_value - model_current_q)
             state = next_state
-    
+
     policy = np.zeros((env.n_states, env.n_actions))
     for i in range(env.n_states):
         best_action = np.argmax(q_table[i])
@@ -85,6 +84,55 @@ def SARSA(env, gamma=0.99, step_size=0.1, epsilon=0.1, max_episode=1000):
             state = next_state
             action = next_action
     
+    policy = np.zeros((env.n_states, env.n_actions))
+    for i in range(env.n_states):
+        best_action = np.argmax(q_table[i])
+        policy[i, best_action] = 1.0
+    
+    return policy, q_table.reshape(-1, 1)
+
+
+def QLearning(env, gamma=0.99, step_size=0.1, epsilon=0.1, max_episode=1000):
+    # Initialize Q(s,a) arbitrarily except Q(terminal,·) =0
+    q_table = np.random.rand(env.n_states, env.n_actions)
+    
+    # Set the qvalues for all goal states to 0
+    for g in env.target:
+        q_table[g] = 0
+
+    # Loop over episodes
+    for i in range(max_episode):
+        state = env.reset()[0]
+        done = False
+
+        # Loop for each step in episode
+        while not done:
+            # Choose action using epsilon greedy
+            if np.random.rand() < epsilon:
+                action = np.random.choice(env.n_actions)
+            else:
+                action = np.argmax(q_table[state])
+            
+            # Take action, observe reward and next state
+            next_state, reward, done, _, _ = env.step(action)
+
+            # Add small negative reward for each step
+            if not done:
+                reward -= 0.01
+            
+            # Q-Learning update: Q(s,a) = Q(s,a) + alpha * [r + gamma * max_a' Q(s',a') - Q(s,a)]
+            if done:
+                max_next_q = 0
+            else:
+                max_next_q = np.max(q_table[next_state])
+
+            current_q = q_table[state, action]
+            target_value = reward + gamma * max_next_q
+            q_table[state, action] = current_q + step_size * (target_value - current_q)
+
+            state = next_state
+    
+    # Extract greedy policy from Q-table
     policy = np.zeros((env.n_states, env.n_actions))
     for i in range(env.n_states):
         best_action = np.argmax(q_table[i])

@@ -3,7 +3,8 @@ November 30th Progress Report
 Progress in Past 2 Weeks:
 
 Alexis
-
+- Modified alogrithm comparison to include Qlearning and added better comparison parameters to better identify which algorithm worked the best for us.
+- Investigated an alternative way to find the most optimal algorithm by finding the optimal path and comparing it to the path taken by each of the algorithms but could not get it working.
 
 Jackson
 - Added DQL Algorithm
