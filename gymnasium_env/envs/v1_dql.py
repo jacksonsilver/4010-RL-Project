@@ -104,7 +104,7 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         rewards_per_episode = np.zeros(n_episodes)
         epsilon_history = np.zeros(n_episodes)
 
-        decaying_epsilon = DecayingEpsilon(start_epsilon=epsilon, end_epsilon=0.1, decay_rate=500000)
+        decaying_epsilon = DecayingEpsilon(start_epsilon=epsilon, end_epsilon=0.1, decay_rate=50000)
 
         # Track number of steps taken. Used for syncing policy => target network.
         step_count=0
@@ -191,12 +191,19 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
             sum_rewards[x] = np.sum(rewards_per_episode[max(0, x-100):(x+1)])
         plt.subplot(121) # plot on a 1 row x 2 col grid, at cell 1
         plt.plot(sum_rewards)
+        plt.xlabel("Episode Number")
+        plt.ylabel("Reward per Episode")
+        plt.title("Rewards Over Episodes")
         
         # Plot epsilon decay (Y-axis) vs episodes (X-axis)
         plt.subplot(122) # plot on a 1 row x 2 col grid, at cell 2
         plt.plot(epsilon_history)
+        plt.xlabel("Episode Number")
+        plt.ylabel("Epsilon Value")
+        plt.title("Epsilon Decay Over Episodes")
         
         # Save plots
+        plt.tight_layout()
         plt.savefig('thin_ice_dql.png')
 
         return policy_dqn.state_dict(), rewards_per_episode
@@ -353,8 +360,8 @@ class ThinIceDQLAgent(ThinIceTrainingAgent):
         
 
 if __name__ == '__main__':
-    thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_13.txt')
-    thin_ice_agent.train(epsilon=0.1, step_size = 0.001, n_episodes=1000)
+    thin_ice_agent = ThinIceDQLAgent(env_id="thin-ice-v1", level_str='level_6.txt')
+    thin_ice_agent.train(epsilon=0.5, step_size = 0.001, n_episodes=1000)
     thin_ice_agent.deploy(episodes=3)
 
     # LARGE TESTING
