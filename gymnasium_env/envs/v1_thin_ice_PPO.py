@@ -59,7 +59,7 @@ class CNNPolicy(nn.Module):
             # action_mask: shape [batch_size, num_actions], dtype: bool
             masked_logits = logits.clone()
             #masked_logits[~action_mask] = float('-inf')
-            masked_logits = logits.masked_fill(~action_mask.squeeze(0), float('-inf'))
+            masked_logits = masked_logits.masked_fill(~action_mask.squeeze(0), float('-inf'))
 
             probs = F.softmax(masked_logits, dim=-1)
         else:
@@ -108,10 +108,10 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         self.k_epoch = 10
         self.v_coef = 0.5
 
-        entropy_start = 0.5
-        entropy_end   = 0.01
-        decay_rate = 0.001
-
+        self.entropy_start = 0.7
+        self.entropy_end   = 0.2
+        self.decay_rate = 0.005   
+        # self.entropy_coef  = 0.9
 
 
         #Initializing CNN (neural network of all states)
@@ -132,8 +132,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         #training loop
         for i in range(n_episodes):
             print(f'============== EPISODE {i} ==============')
-            progress = 1/n_episodes
-            self.entropy_coef = entropy_end + (entropy_start - entropy_end) * math.exp(-decay_rate * i)
+            self.entropy_coef = self.entropy_end + (self.entropy_start - self.entropy_end) * math.exp(-self.decay_rate * i)
 
 
             state = env.reset()[0]
@@ -175,7 +174,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                     episode_reward -=1 
                     env.render()
                     pygame.quit()
-                    #self.add_to_memory(state_tensor, torch.tensor([0]), reward, state_tensor, 0.0, terminated,action_mask)
+                    #self.add_to_memory(state_tensor, torch.tensor([0]), reward, state_tensor, 0.0, terminated, action_mask)
                     break
                 
                 else:
@@ -185,9 +184,25 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                     action_prob =probs[0,action.item()].item()
                     print(f' this is action.item whtever: {action.item()}')
 
-                    next_state,reward,terminated,_,_ = env.step(action.item())
+                    next_state,reward,terminated,_,info = env.step(action.item())
                     next_state_tensor = self.state_index_to_tensor(env,next_state)
                     episode_reward += reward
+
+                    if info['target_reached'] and info['all_tiles_covered']:
+                        self.entropy_start =0.0
+                        self.entropy_end  = 0.0
+                        self.decay_rate = 0.0
+                        print('task completed!')
+                        self.entropy_coef = 0.0 # no more exploring, this is the best we;ve got
+                                #save policy
+                        path = self.getPkFolderPath('PPO')
+                        filename = self.reference_name + '_solution-WORKING.pt'
+                        torch.save(self.policy_network.state_dict(),os.path.join(path,filename))
+                        print(f'Saved model to {filename}')
+                        self.plot_graph(episode_rewards)
+                        env.close()
+                        break
+
 
                     #store values
                     self.add_to_memory(state_tensor,action,reward,next_state_tensor,action_prob,terminated,action_mask)
@@ -285,7 +300,7 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
             delta = rewards[t] + self.gamma * next_values[t] * (1 - terminals[t]) - values[t]
             #print(f"GAE shape at t={t}: {gae.shape}")
             gae = delta + self.gamma * self.lmbda * (1 - terminals[t]) * gae
-            advantages[t] = gae.view(-1)[0]
+            advantages[t] = gae
 
        # advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
@@ -426,14 +441,13 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
             state = next_state
             steps += 1
 
-            if render and terminated:
-                filename = self.reference_name + f'_agent_final_path.png'
-                filepath = self.getAgentSolutionsFolderPath("PPO")
-                pygame.image.save(pygame.display.get_surface(), os.path.join(filepath, filename))
+        if render and terminated:
+            filename = self.reference_name + f'_agent_final_path.png'
+            filepath = self.getAgentSolutionsFolderPath("PPO")
+            pygame.image.save(pygame.display.get_surface(), os.path.join(filepath, filename))
 
-                print(f'Created Snapshot of final path: {filename}')
-                pygame.time.wait(1000) 
-                break
+            print(f'Created Snapshot of final path: {filename}')
+            #pygame.time.wait(1000) 
 
         print(f"Deployment finished. Total reward: {total_reward}")
         env.close()

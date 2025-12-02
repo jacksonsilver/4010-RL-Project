@@ -132,6 +132,7 @@ class ThinIceEnv(gym.Env):
         return obs, info
 
     def step(self, action):
+        all_tiles_covered = False
         # Perform action
         target_reached = self.level.perform_action(ti.PlayerActions(action))
 
@@ -157,17 +158,30 @@ class ThinIceEnv(gym.Env):
             terminated = True
         
         if target_reached:
-            if (len(self.visited_tiles)+1) == self.level.n_visitable_tiles:
-                reward += 10   # big bonus for perfect coverage
-                print('ALL TILES COVERED!')
-            else:
-                reward += 2    # smaller bonus if target reached early
-
+            print(f'I have done {len(self.visited_tiles)}')
+            print(f'from the total of {self.level.n_visitable_tiles}')
             terminated= True
             print("AGENT REACHED TARGET!!!")
+
+            # Dynamic reward based on the coverage of tiles
+            coverage_ratio = len(self.visited_tiles) / self.level.n_visitable_tiles
+            if coverage_ratio == 1.0:
+                reward += 10  # Big reward for covering all tiles
+                all_tiles_covered = True
+                print('ALL TILES COVERED!')
+            elif coverage_ratio >= 0.75:
+                reward += 7   # High reward for covering 75% or more
+            elif coverage_ratio >= 0.5:
+                reward += 5   # Moderate reward for covering 50% or more
+            else:
+                reward += 2   # Small reward for some progress
+
         
         # Debug information
-        info = {}
+        info = {
+            'all_tiles_covered':all_tiles_covered,
+            'target_reached': target_reached
+            }
 
         if self.render_mode == "human":
             print(f"Action taken: {ti.PlayerActions(action)}")
