@@ -43,6 +43,7 @@ class LevelTileType(Enum):
     WATER = 2
     WALL = 3
     TARGET = 4
+    HARD_ICE = 5
 
     def get_water_mask(self):
         match(self):
@@ -50,6 +51,16 @@ class LevelTileType(Enum):
                 return 1
             case _:
                 return 0
+    
+    # Gets all types the tile can possibly be transformed into
+    def get_possible_types(self):
+        match(self):
+            case LevelTileType.FLOOR:
+                return [LevelTileType.FLOOR.value, LevelTileType.WATER.value]
+            case LevelTileType.HARD_ICE:
+                return [LevelTileType.HARD_ICE.value, LevelTileType.FLOOR.value, LevelTileType.WATER.value]
+            case _:
+                return [self.value]
 
     # For printing the first letter of the tile
     def __str__(self):
@@ -64,6 +75,8 @@ class LevelTileType(Enum):
                 return 'W'
             case LevelTileType.TARGET:
                 return 'T'
+            case LevelTileType.HARD_ICE:
+                return 'H'
             case _:
                 return '?'
 
@@ -79,6 +92,10 @@ class Tile():
     @property
     def tile_type(self):
         return self._tile_type
+    
+    @property
+    def init_tile_type(self):
+        return self._init_tile_type
     
     @tile_type.setter
     def tile_type(self, new_type: LevelTileType):
@@ -103,8 +120,7 @@ class Level:
         #  Reset tiles
         for row in self.tiles:
             for tile in row:
-                if tile.tile_type == LevelTileType.WATER:
-                    tile.tile_type = LevelTileType.FLOOR
+                tile.reset()
 
     def generate_tiles(self, level_str: str):
         tiles_list = []
@@ -129,6 +145,8 @@ class Level:
                             self._player_start = tile_position
                         case 'B':
                             tile_type = LevelTileType.BLANK
+                        case 'H':
+                            tile_type = LevelTileType.HARD_ICE
                         case _:
                             tile_type = None
                     
@@ -144,6 +162,22 @@ class Level:
             for tile in row:
                 if tile.tile_type in [LevelTileType.FLOOR, LevelTileType.TARGET]:
                     count += 1
+                elif tile.tile_type == LevelTileType.HARD_ICE:
+                    count += 2
+        return count
+
+    def get_visited_tile_count(self):
+        count = 0
+        for row in self.tiles:
+            for tile in row:
+                # Any tile that is water means that it has been visited
+                if tile.tile_type == LevelTileType.WATER:
+                    count += 1
+                
+                # If a tile's initial type was hard ice and it it's current is not, it means it has been visited.
+                # Previous check accounts for double visit
+                if tile.init_tile_type == LevelTileType.HARD_ICE and tile.tile_type != tile.init_tile_type:
+                    count += 1
         return count
 
     # Called in step function, returns True if reached target
@@ -154,10 +188,15 @@ class Level:
         new_tile = self.get_tile(new_pos)
         old_tile = self.get_tile(self.player_position)
         if new_tile is not None and new_tile.tile_type != LevelTileType.WALL:
-            if old_tile.tile_type == LevelTileType.FLOOR:
+            # If player walks off hard ice, it becomes floor
+            if old_tile.tile_type == LevelTileType.HARD_ICE:
+                old_tile.tile_type = LevelTileType.FLOOR
+            
+            # If player walks off floor, it becomes water
+            elif old_tile.tile_type == LevelTileType.FLOOR:
                 old_tile.tile_type = LevelTileType.WATER
-
-            print("Moving to ", new_pos)
+            
+            #print("Moving to ", new_pos)
             self._player_position = new_pos
         else:
             print("Invalid move to ", new_pos)
@@ -187,6 +226,64 @@ class Level:
         if position[0] < 0 or position[1] < 0 or position[0] >= self.n_cols or position[1] >= self.n_rows:
             return None
         return self.tiles[position[1]][position[0]]
+
+    def get_surrounding_grid_types(self, position: tuple) -> list[int]:
+        # Gets the tile types (in ints) of the tiles in a 3x3 grid centered at the given position
+        tile = self.get_tile(position)
+        if tile is None:
+            return []
+        
+        types = []
+        # Loop through the 3x3 grid, starting at top left corner, with bottom right corner last
+        for dy in [-1, 0, 1]:
+            for dx in [-1, 0, 1]:
+                neighbor_pos = (position[0] + dx, position[1] + dy)
+                neighbor_tile = self.get_tile(neighbor_pos)
+                if neighbor_tile is not None:
+                    types.append(neighbor_tile.tile_type.value)
+                else:
+                    types.append(LevelTileType.BLANK.value)
+        return types
+    
+    def get_all_possible_surrounding_grid_types(self, position: tuple) -> list[tuple[int]]:
+        # Gets all possible combinations of tile types (in ints) of the tiles in a 3x3 grid centered at the given position
+        current_grid = self.get_surrounding_grid_types(position)
+        if len(current_grid) == 0:
+            return []
+        
+        # Go through each tile in the grid and get all possible types for that tile and add to list of list
+        tile_types_options = []
+
+        for i in range(len(current_grid)):
+            i_tile_type = current_grid[i]
+            i_all_options = LevelTileType(i_tile_type).get_possible_types()
+            tile_types_options.append(i_all_options)
+        
+        # Get all possible combinations of tile types in tile_types_options list
+        # I'm so sorry about this code I just genuinely couldn't figure out a better way to do it
+        grid_options = set()
+        for i, type1 in enumerate(tile_types_options[0]):
+            for j, type2 in enumerate(tile_types_options[1]):
+                for k, type3 in enumerate(tile_types_options[2]):
+                    for l, type4 in enumerate(tile_types_options[3]):
+                        for m, type5 in enumerate(tile_types_options[4]):
+                            for n, type6 in enumerate(tile_types_options[5]):
+                                for o, type7 in enumerate(tile_types_options[6]):
+                                    for p, type8 in enumerate(tile_types_options[7]):
+                                        for q, type9 in enumerate(tile_types_options[8]):
+                                            grid_options.add((type1, type2, type3, type4, type5, type6, type7, type8, type9))
+        return list(grid_options)
+    
+    def get_termination_actions(self, position: tuple) -> list[int]:
+        termination_actions = []
+        # Returns the actions that would lead to termination (touching a water tile)
+        for action in PlayerActions:
+            dx, dy = action.get_direction()
+            new_pos = (position[0] + dx, position[1] + dy)
+            new_tile = self.get_tile(new_pos)
+            if new_tile is not None and new_tile.tile_type == LevelTileType.WATER:
+                termination_actions.append(action.value)
+        return termination_actions
     
     @property
     def n_rows(self):
