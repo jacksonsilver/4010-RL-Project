@@ -284,7 +284,7 @@ class ThinIceEnv(gym.Env):
 
 # Run to test the environment
 if __name__ == "__main__":
-    env = gym.make('thin-ice-v1', render_mode='human', level_str='level_12.txt')
+    env = gym.make('thin-ice-v1', render_mode='human', level_str='level_13.txt')
 
     print("======================================== Check environment begin ========================================")
     check_env(env, warn=True)
@@ -298,7 +298,6 @@ if __name__ == "__main__":
     # Take a random action
     for i in range(10):
         action = env.action_space.sample()
-        action = 3
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated:
             print("Game over!")
