@@ -41,14 +41,8 @@ def test_policy_performance(env, policy, n_tests=50):
     # Calculate averages across all test runs
     avg_reward = total_reward / n_tests
     success_rate = success_count / n_tests
-    avg_steps = total_steps / n_tests
-    if (successful_steps):
-        avg_successful_steps = np.mean(successful_steps) 
-    else:
-        avg_successful_steps = 0
-    # avg_successful_steps = np.mean(successful_steps) if successful_steps else 0
     
-    return avg_reward, success_rate, avg_steps, avg_successful_steps
+    return avg_reward, success_rate
 
 # Trains an algorithm and checks how it improves over time
 # Shows learning progress at regular intervals
@@ -66,8 +60,7 @@ def track_learning_progress(env, algorithm, algorithm_name, episodes=500, eval_i
                 policy, _ = algorithm(env, max_episode=episode)
                 
             # Test how good the current policy is
-            # avg_reward, success_rate = test_policy_performance(env, policy, n_tests=10)
-            avg_reward, success_rate, _, _ = test_policy_performance(env, policy, n_tests=10)
+            avg_reward, success_rate = test_policy_performance(env, policy, n_tests=10)
         else:
             avg_reward, success_rate = 0, 0  # No training yet
             
@@ -124,7 +117,6 @@ def compare_best_parameters(env, algorithms, n_trials=5):
             # Run multiple trials for each parameter combo
             trial_rewards = []
             trial_success_rates = []
-            trial_steps = []
             
             for trial in range(n_trials):
                 # different seed for each trial
@@ -137,22 +129,17 @@ def compare_best_parameters(env, algorithms, n_trials=5):
                     policy, _ = algo_func(env, **parameter, max_episode=500)
                 
                 # Test performance with these settings
-                avg_reward, success_rate, avg_steps, _ = test_policy_performance(env, policy, n_tests=30)
+                avg_reward, success_rate = test_policy_performance(env, policy, n_tests=30)
                 trial_rewards.append(avg_reward)
                 trial_success_rates.append(success_rate)
-                trial_steps.append(avg_steps)
             
             # Calculate mean and std across trials
             algo_results.append({
                 'params': parameter,
-                # 'avg_reward': avg_reward,
-                # 'success_rate': success_rate
                 'avg_reward': np.mean(trial_rewards),
                 'std_reward': np.std(trial_rewards),
                 'success_rate': np.mean(trial_success_rates),
                 'std_success': np.std(trial_success_rates),
-                'avg_steps': np.mean(trial_steps),
-                'std_steps': np.std(trial_steps),
                 'trial_rewards': trial_rewards,
                 'success_rates': trial_success_rates
             })
@@ -190,7 +177,7 @@ def compare_training_needed(env, algorithms, max_episodes=1000, n_trials=3):
                     policy, _ = algo_func(env, max_episode=episodes)
                     
                 # test performance after the training
-                avg_reward, success_rate, _, _ = test_policy_performance(env, policy, n_tests=20)
+                avg_reward, success_rate = test_policy_performance(env, policy, n_tests=20)
                 
                 # record sucesses and best performance
                 if success_rate >= target_success and episodes_needed is None:
@@ -243,7 +230,6 @@ def main():
         print(f"  Best parameters: learning rate={best['params']['step_size']}, epsilon={best['params']['epsilon']}")
         print(f"  Success rate: {best['success_rate']:.1%} ± {best['std_success']:.1%}")
         print(f"  Avg reward: {best['avg_reward']:.2f} ± {best['std_reward']:.2f}")
-        print(f"  Avg steps: {best['avg_steps']:.1f} ± {best['std_steps']:.1f}")
     
     # check how quickly each algorithm learns
     print("\n" + "="*80)
@@ -285,7 +271,6 @@ def main():
     print(f"Best settings: learning rate = {best_config['params']['step_size']}, epsilon = {best_config['params']['epsilon']}")
     print(f"Success rate: {best_config['success_rate']:.1%} ± {best_config['std_success']:.1%}")
     print(f"Avg reward: {best_config['avg_reward']:.2f} ± {best_config['std_reward']:.2f}")
-    print(f"Avg steps: {best_config['avg_steps']:.1f} ± {best_config['std_steps']:.1f}")
     
     print("\n" + "="*80)
 
