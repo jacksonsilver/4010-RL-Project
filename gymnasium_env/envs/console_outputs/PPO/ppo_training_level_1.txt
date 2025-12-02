@@ -1,0 +1,1024 @@
+===== Beginning Training
+============== EPISODE 0 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 0 reward: 14
+============== EPISODE 1 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 1 reward: 14
+============== EPISODE 2 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 2 reward: 14
+============== EPISODE 3 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 3 reward: 14
+============== EPISODE 4 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 4 reward: 14
+============== EPISODE 5 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 5 reward: 14
+============== EPISODE 6 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 6 reward: 14
+============== EPISODE 7 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 7 reward: 14
+============== EPISODE 8 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 8 reward: 14
+============== EPISODE 9 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 9 reward: 14
+============== EPISODE 10 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 10 reward: 14
+============== EPISODE 11 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 11 reward: 14
+============== EPISODE 12 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 12 reward: 14
+============== EPISODE 13 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 13 reward: 14
+============== EPISODE 14 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 14 reward: 14
+============== EPISODE 15 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 15 reward: 14
+============== EPISODE 16 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 16 reward: 14
+============== EPISODE 17 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 17 reward: 14
+============== EPISODE 18 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 18 reward: 14
+============== EPISODE 19 ==============
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (13, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (12, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (11, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (10, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (9, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (8, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (7, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (6, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (5, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (4, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (3, 10)
+Action mask: [[ True False False False]]
+Probabilities: [[1. 0. 0. 0.]]
+ this is action.item whtever: 0
+Moving to  (2, 10)
+AGENT REACHED TARGET!!!
+Episode 19 reward: 14
+Saved model to v0-level_1_solution.pt
+Generated Graph: v0-level_1-reward-graph.png
+Generated Loss Graph: v0-level_1-loss-graph.png

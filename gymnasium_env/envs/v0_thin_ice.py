@@ -124,6 +124,7 @@ class Level:
 
     def generate_tiles(self, level_str: str):
         tiles_list = []
+        self._n_tile_types = 6 #make sure to change
         with open(PATH_TO_LEVELS + level_str, 'r') as f:
             for line in f.readlines():
                 row = [] # An array of tiles
@@ -316,6 +317,10 @@ class Level:
     @property
     def target(self):
         return self._target
+    
+    @property
+    def n_tile_types(self):
+        return self._n_tile_types
     
     # For printing out the level
     def __str__(self):
