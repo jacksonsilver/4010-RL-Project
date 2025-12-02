@@ -3,7 +3,7 @@ import sys
 import argparse
 from typing import Final
 
-from gymnasium_env.envs.v1_thin_ice_train import ThinIceDQNAgent
+from gymnasium_env.envs.DQN.v1_thin_ice_train import ThinIceDQNAgent
 
 PATH_TO_LEVELS: Final[str] = './level_txt_files/'
 

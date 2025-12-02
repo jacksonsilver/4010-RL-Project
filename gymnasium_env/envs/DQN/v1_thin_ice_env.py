@@ -147,27 +147,28 @@ class ThinIceEnv(gym.Env):
 
         player_tile = self._level.get_tile(new_pos)
         terminated, reward, avail_mask = False, 0, 0
+        info = {}
 
         # Make sure curr position is valid
         if player_tile is None: 
-            reward = -100
+            reward = -1
             terminated = True
 
         # Going into water results in death
         elif player_tile.tile_type == ti.LevelTileType.WATER: 
-            reward = -100
+            reward = -1
             terminated = True 
         
         # Check that player finished game correctly (visited all tiles)
         elif target_reached:
             self.visited_tiles.add(new_pos)
-            reward = 1000 if len(self.visited_tiles) >= self._level.n_visitable_tiles else -100
+            reward = 1 if len(self.visited_tiles) >= self._level.n_visitable_tiles else -1
             terminated = True
 
         if not terminated:
             # Punish no exploration
             if not pos_changed: 
-                reward = -10 
+                reward = -1
 
             else:
                 # Stepped on a new tile -> More discovery -> Small Reward
@@ -176,14 +177,14 @@ class ThinIceEnv(gym.Env):
                     reward = 1 
                 # Should never be reached, but just in case of possible exploit
                 else: 
-                    reward = -100
+                    reward = -1
                     terminated = True 
 
         # Check if agent trapped itself on a lone tile (no valid moves) and immediately terminate 
         if player_tile is not None and not terminated:
             avail_mask = self._level.get_available_actions(player_tile)
             if avail_mask == 0 and not target_reached: 
-                reward = -100
+                reward = -1
                 terminated = True
 
         obs_dict = self._get_obs_dict()
