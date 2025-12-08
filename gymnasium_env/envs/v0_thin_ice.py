@@ -1,6 +1,7 @@
 from enum import Enum
 import numpy as np
 from typing import Final
+from itertools import product
 
 PATH_TO_LEVELS: Final[str] = './level_txt_files/'
 
@@ -229,7 +230,7 @@ class Level:
         return self.tiles[position[1]][position[0]]
 
     def get_surrounding_grid_types(self, position: tuple) -> list[int]:
-        # Gets the tile types (in ints) of the tiles in a 3x3 grid centered at the given position
+        # Gets the tile types (in ints) of the tiles in a 5x5 grid centered at the given position
         tile = self.get_tile(position)
         if tile is None:
             return []
@@ -247,7 +248,7 @@ class Level:
         return types
     
     def get_all_possible_surrounding_grid_types(self, position: tuple) -> list[tuple[int]]:
-        # Gets all possible combinations of tile types (in ints) of the tiles in a 3x3 grid centered at the given position
+        # Gets all possible combinations of tile types (in ints) of the tiles in a 5x5 grid centered at the given position
         current_grid = self.get_surrounding_grid_types(position)
         if len(current_grid) == 0:
             return []
@@ -260,19 +261,8 @@ class Level:
             i_all_options = LevelTileType(i_tile_type).get_possible_types()
             tile_types_options.append(i_all_options)
         
-        # Get all possible combinations of tile types in tile_types_options list
-        # I'm so sorry about this code I just genuinely couldn't figure out a better way to do it
-        grid_options = set()
-        for i, type1 in enumerate(tile_types_options[0]):
-            for j, type2 in enumerate(tile_types_options[1]):
-                for k, type3 in enumerate(tile_types_options[2]):
-                    for l, type4 in enumerate(tile_types_options[3]):
-                        for m, type5 in enumerate(tile_types_options[4]):
-                            for n, type6 in enumerate(tile_types_options[5]):
-                                for o, type7 in enumerate(tile_types_options[6]):
-                                    for p, type8 in enumerate(tile_types_options[7]):
-                                        for q, type9 in enumerate(tile_types_options[8]):
-                                            grid_options.add((type1, type2, type3, type4, type5, type6, type7, type8, type9))
+        grid_options = set(product(*tile_types_options))
+        
         return list(grid_options)
     
     def get_termination_actions(self, position: tuple) -> list[int]:
