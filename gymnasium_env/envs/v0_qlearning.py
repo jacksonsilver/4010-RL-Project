@@ -115,18 +115,22 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         pickle.dump(q,f)
         f.close()
 
-        return q, rewards_per_episode, successful_episodes
+        return q, rewards_per_episode, successful_episodes/n_episodes
 
     def run_policy(self, q, env, n_episodes: int = 100, max_steps: int = 500):
-        """Evaluate a trained Q-table policy and return visited tile percentages."""
+        """Evaluate a trained Q-table policy and return success rate and visited tile percentages."""
         visited_tile_percents = []
+        successful_episodes = 0
+        targets = env.unwrapped.target
         
         for _ in range(n_episodes):
             state = env.reset()[0]
             terminated = False
             step_count = 0
-            visited_tiles = set()
             
+            # Get total visitable tiles AFTER reset (when level is fresh)
+            total_visitable_tiles = env.unwrapped.level.get_visitable_tile_count()
+
             while not terminated and step_count < max_steps:
                 step_count += 1
                 
@@ -140,19 +144,32 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                 action = available_actions[np.argmax(q[state, available_actions])]
                 
                 next_state, reward, terminated, _, info = env.step(action)
-                visited_tiles.add(state)
                 state = next_state
             
+            # Check if episode was successful (reached target)
+            if state in targets:
+                successful_episodes += 1
+            
             # Calculate percentage of tiles visited
-            total_tiles = env.unwrapped.n_states
-            visited_percent = len(visited_tiles) / total_tiles * 100
+            try:
+                visited_count = env.unwrapped.level.get_visited_tile_count()
+                # Cap at 100% in case of any edge cases
+                visited_percent = min((visited_count / total_visitable_tiles) * 100, 100.0)
+            except:
+                visited_percent = 0.0
             visited_tile_percents.append(visited_percent)
         
-        return visited_tile_percents
+        # Return success rate (0-1) and visited tile percentages
+        success_rate = successful_episodes / n_episodes
+        return visited_tile_percents, success_rate
 
     def _create_results_table(self, title, row_labels, col_labels, data, filename):
         """Helper function to create and save a results table as an image."""
-        fig, ax = plt.subplots(figsize=(max(8, len(col_labels) * 1.5), max(4, len(row_labels) * 0.5 + 2)))
+        # Calculate figure size based on number of rows and columns
+        fig_width = max(10, len(col_labels) * 2.5 + 3)
+        fig_height = max(4, len(row_labels) * 0.4 + 2)
+        
+        fig, ax = plt.subplots(figsize=(fig_width, fig_height))
         ax.axis('tight')
         ax.axis('off')
         
@@ -169,19 +186,22 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
         
         table.auto_set_font_size(False)
         table.set_fontsize(9)
-        table.scale(1.2, 1.5)
+        table.scale(1.2, 1.4)
         
         # Style header cells
         for j in range(len(col_labels)):
             table[(0, j)].set_facecolor('#4472C4')
             table[(0, j)].set_text_props(color='white', fontweight='bold')
         
-        # Style row label cells
+        # Style row label cells with alternating colors for better readability
         for i in range(len(row_labels)):
-            table[(i + 1, -1)].set_facecolor('#D9E2F3')
-            table[(i + 1, -1)].set_text_props(fontweight='bold')
+            if i % 3 == 0:  # Group by step_size (every 3 rows is a new episode count)
+                table[(i + 1, -1)].set_facecolor('#D9E2F3')
+            else:
+                table[(i + 1, -1)].set_facecolor('#E9EFF7')
+            table[(i + 1, -1)].set_text_props(fontweight='bold', fontsize=8)
         
-        ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
+        ax.set_title(title, fontsize=12, fontweight='bold', pad=20)
         
         plt.tight_layout()
         save_path = os.path.join(self.getGraphFolderPath(self.algorithm_name), filename)
@@ -191,14 +211,13 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
 
     def runQLearningTesting(self, n_runs: int = 5):
         def repeatExperiments(self, env, n_episodes=1000, step_size=0.1, epsilon=0.1, end_epsilon=0.05, decay_rate=4000000, gamma=0.9):
-            num_envs = n_episodes
             total_visit_percents = []
             avg_rewards_per_episode = []
-            avg_successful_episodes = []
+            avg_successful_episodes = []  # Now tracks evaluation success rate (0-1)
             
             for i in range(n_runs):
                 print(f"TRAINING Run {i+1}/{n_runs}")
-                q, rewards_per_episode, successful_episodes = self.train(
+                q, rewards_per_episode, training_successes = self.train(
                     n_episodes=n_episodes, 
                     epsilon=epsilon, 
                     step_size=step_size, 
@@ -208,119 +227,118 @@ class ThinIceQLearningAgent(ThinIceTrainingAgent):
                 )
 
                 print("EVALUATE")
-                visited_tile_percents = self.run_policy(q=q, env=env)
+                visited_tile_percents, eval_success_rate = self.run_policy(q=q, env=env)
                 total_visit_percents.extend(visited_tile_percents)
                 avg_rewards_per_episode.append(np.mean(rewards_per_episode))
-                avg_successful_episodes.append(successful_episodes / num_envs)
+                avg_successful_episodes.append(training_successes) 
             
-            return np.mean(total_visit_percents), np.mean(avg_rewards_per_episode), np.mean(avg_successful_episodes)
+            return np.mean(total_visit_percents), np.mean(avg_rewards_per_episode), np.mean(avg_successful_episodes) * 100
 
         env: ti.ThinIceEnv = gym.make(self.env_id, level_str=self.level_str, render_mode=None)
 
         # # Go through different episode counts and step sizes to see performance
-        step_sizes = [0.1, 0.01, 0.001]
-        episode_counts = [2000, 10000, 20000]
-        init_epsilons = [0.1, 0.3, 0.5]
-
-        results = []
-        i = 0
-
-        # # Test different combinations of step_size, episodes, and epsilon
-        for episode in episode_counts:
-            for step_size in step_sizes:
-                for epsilon in init_epsilons:
-                    percent_correct, avg_reward, avg_successful_episodes = repeatExperiments(
-                        self, env, n_episodes=episode, step_size=step_size, epsilon=epsilon
-                    )
-                    results.append((percent_correct, avg_reward, avg_successful_episodes))
-
-        # # Create tables for step_size/episode/epsilon testing
-        for ep_idx, episode in enumerate(episode_counts):
-            # Extract results for this episode count
-            start_idx = ep_idx * len(step_sizes) * len(init_epsilons)
-            end_idx = start_idx + len(step_sizes) * len(init_epsilons)
-            ep_results = results[start_idx:end_idx]
-            
-            # Reshape into tables (step_sizes x init_epsilons)
-            percent_data = []
-            reward_data = []
-            success_data = []
-            
-            for s_idx, step_size in enumerate(step_sizes):
-                percent_row = []
-                reward_row = []
-                success_row = []
-                for e_idx, epsilon in enumerate(init_epsilons):
-                    idx = s_idx * len(init_epsilons) + e_idx
-                    percent_row.append(ep_results[idx][0])
-                    reward_row.append(ep_results[idx][1])
-                    success_row.append(ep_results[idx][2])
-                percent_data.append(percent_row)
-                reward_data.append(reward_row)
-                success_data.append(success_row)
-            
-            row_labels = [f"α={s}" for s in step_sizes]
-            col_labels = [f"ε={e}" for e in init_epsilons]
-            
-            self._create_results_table(f"Percent Correct (Episodes={episode})", row_labels, col_labels, percent_data, f"hyperparams_ep{episode}_percent.png")
-            self._create_results_table(f"Avg Reward (Episodes={episode})", row_labels, col_labels, reward_data, f"hyperparams_ep{episode}_reward.png")
-            self._create_results_table(f"Avg Successful Episodes (Episodes={episode})", row_labels, col_labels, success_data, f"hyperparams_ep{episode}_success.png")
-
-        for episode in episode_counts:    
-            for step_size in step_sizes:
-                for epsilon in init_epsilons:
-                    percent_correct = results[i][0]
-                    avg_reward = results[i][1]
-                    avg_successful_episodes = results[i][2]
-                    i += 1
-                    print(f"alpha, episode, epsilon: {step_size}, {episode}, {epsilon}, Avg. Percent Correct: {percent_correct}, avg reward: {avg_reward}, avg successful episodes: {avg_successful_episodes}")
-
-        # # Test different epsilon decay configurations
+        # step_sizes = [0.1, 0.01, 0.001]
+        # episode_counts = [2000, 10000, 20000]
         # init_epsilons = [0.1, 0.3, 0.5]
-        # end_epsilons = [0.001, 0.05, 0.1]
-        # decay_rates = [1000000, 4000000, 8000000]
 
-        # results_decay = []
-        # j = 0
+        # results = []
+        # i = 0
 
-        # for init_epsilon in init_epsilons:
-        #     for end_epsilon in end_epsilons:
-        #         for rate in decay_rates:
+        # # # Test different combinations of step_size, episodes, and epsilon
+        # for episode in episode_counts:
+        #     for step_size in step_sizes:
+        #         for epsilon in init_epsilons:
         #             percent_correct, avg_reward, avg_successful_episodes = repeatExperiments(
-        #                 self, env, n_episodes=2000, step_size=0.1, epsilon=init_epsilon, 
-        #                 end_epsilon=end_epsilon, decay_rate=rate
+        #                 self, env, n_episodes=episode, step_size=step_size, epsilon=epsilon
         #             )
-        #             results_decay.append((percent_correct, avg_reward, avg_successful_episodes))
+        #             results.append((percent_correct, avg_reward, avg_successful_episodes))
+
+        # # Create 3 consolidated tables showing ALL combinations
+        # # Rows: step_size × episode_count combinations
+        # # Columns: init_epsilon values
+        # percent_data = []
+        # reward_data = []
+        # success_data = []
+        # row_labels = []
         
-        # # Create tables for epsilon decay testing
-        # for ie_idx, init_epsilon in enumerate(init_epsilons):
-        #     start_idx = ie_idx * len(end_epsilons) * len(decay_rates)
-        #     end_idx = start_idx + len(end_epsilons) * len(decay_rates)
-        #     ie_results = results_decay[start_idx:end_idx]
-        #     
-        #     percent_data = []
-        #     reward_data = []
-        #     success_data = []
-        #     
-        #     for ee_idx, end_epsilon in enumerate(end_epsilons):
+        # idx = 0
+        # for episode in episode_counts:
+        #     for step_size in step_sizes:
         #         percent_row = []
         #         reward_row = []
         #         success_row = []
-        #         for dr_idx, rate in enumerate(decay_rates):
-        #             idx = ee_idx * len(decay_rates) + dr_idx
-        #             percent_row.append(ie_results[idx][0])
-        #             reward_row.append(ie_results[idx][1])
-        #             success_row.append(ie_results[idx][2])
+        #         for epsilon in init_epsilons:
+        #             percent_row.append(results[idx][0])
+        #             reward_row.append(results[idx][1])
+        #             success_row.append(results[idx][2])
+        #             idx += 1
         #         percent_data.append(percent_row)
         #         reward_data.append(reward_row)
         #         success_data.append(success_row)
-        #     
-        #     row_labels = [f"end_ε={e}" for e in end_epsilons]
-        #     col_labels = [f"decay={r}" for r in decay_rates]
-        #     
-        #     self._create_results_table(f"Percent Correct (init_ε={init_epsilon})", row_labels, col_labels, percent_data, f"epsilon_decay_ie{init_epsilon}_percent.png")
-        #     self._create_results_table(f"Avg Reward (init_ε={init_epsilon})", row_labels, col_labels, reward_data, f"epsilon_decay_ie{init_epsilon}_reward.png")
-        #     self._create_results_table(f"Avg Successful Episodes (init_ε={init_epsilon})", row_labels, col_labels, success_data, f"epsilon_decay_ie{init_epsilon}_success.png")
+        #         row_labels.append(f"α={step_size}, ep={episode}")
+        
+        # col_labels = [f"ε={e}" for e in init_epsilons]
+        
+        # self._create_results_table("% Tiles Visited (All Hyperparameter Combinations)", row_labels, col_labels, percent_data, "hyperparams_percent_visited.png")
+        # self._create_results_table("Avg Reward per Episode (All Hyperparameter Combinations)", row_labels, col_labels, reward_data, "hyperparams_avg_reward.png")
+        # self._create_results_table("Avg Success Rate (All Hyperparameter Combinations)", row_labels, col_labels, success_data, "hyperparams_success_rate.png")
+
+        # for episode in episode_counts:    
+        #     for step_size in step_sizes:
+        #         for epsilon in init_epsilons:
+        #             percent_correct = results[i][0]
+        #             avg_reward = results[i][1]
+        #             avg_successful_episodes = results[i][2]
+        #             i += 1
+        #             print(f"alpha, episode, epsilon: {step_size}, {episode}, {epsilon}, Avg. Percent Correct: {percent_correct}, avg reward: {avg_reward}, avg successful episodes: {avg_successful_episodes}")
+
+        # # Test different epsilon decay configurations
+        init_epsilons = [0.1, 0.3, 0.5]
+        end_epsilons = [0.001, 0.05, 0.1]
+        decay_rates = [1000000, 4000000, 8000000]
+
+        results_decay = []
+        j = 0
+
+        for init_epsilon in init_epsilons:
+            for end_epsilon in end_epsilons:
+                for rate in decay_rates:
+                    percent_correct, avg_reward, avg_successful_episodes = repeatExperiments(
+                        self, env, n_episodes=20000, step_size=0.1, epsilon=init_epsilon, 
+                        end_epsilon=end_epsilon, decay_rate=rate
+                    )
+                    results_decay.append((percent_correct, avg_reward, avg_successful_episodes))
+        
+        # Create 3 consolidated tables for epsilon decay testing
+        # Rows: init_epsilon × end_epsilon combinations
+        # Columns: decay_rate values
+        percent_data_decay = []
+        reward_data_decay = []
+        success_data_decay = []
+        row_labels_decay = []
+        
+        idx = 0
+        for init_epsilon in init_epsilons:
+            for end_epsilon in end_epsilons:
+                percent_row = []
+                reward_row = []
+                success_row = []
+                for rate in decay_rates:
+                    percent_row.append(results_decay[idx][0])
+                    reward_row.append(results_decay[idx][1])
+                    success_row.append(results_decay[idx][2])
+                    idx += 1
+                percent_data_decay.append(percent_row)
+                reward_data_decay.append(reward_row)
+                success_data_decay.append(success_row)
+                row_labels_decay.append(f"init_ε={init_epsilon}, end_ε={end_epsilon}")
+        
+        # Format decay rates for column labels (e.g., 1M, 4M, 8M)
+        col_labels_decay = [f"decay={r//1000000}M" for r in decay_rates]
+        
+        self._create_results_table("% Tiles Visited (Epsilon Decay Combinations)", row_labels_decay, col_labels_decay, percent_data_decay, "epsilon_decay_percent_visited.png")
+        self._create_results_table("Avg Reward per Episode (Epsilon Decay Combinations)", row_labels_decay, col_labels_decay, reward_data_decay, "epsilon_decay_avg_reward.png")
+        self._create_results_table("Avg Success Rate (Epsilon Decay Combinations)", row_labels_decay, col_labels_decay, success_data_decay, "epsilon_decay_success_rate.png")
 
         # for init_epsilon in init_epsilons:
         #     for end_epsilon in end_epsilons:
