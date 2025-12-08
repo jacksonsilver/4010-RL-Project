@@ -149,7 +149,7 @@ class ThinIceEnv(gym.Env):
         if target_reached:
             all_tiles_covered =( (len(self.visited_tiles)+1) == self.level.n_visitable_tiles )
             if all_tiles_covered:
-                reward += 25
+                reward += 50
             reward += 10
 
         elif player_tile.tile_type == ti.LevelTileType.WATER:
