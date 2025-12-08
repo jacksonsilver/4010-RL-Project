@@ -108,10 +108,10 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         self.k_epoch = 10
         self.v_coef = 0.5
 
-        self.entropy_start = 0.7
-        self.entropy_end   = 0.2
-        self.decay_rate = 0.005   
-        # self.entropy_coef  = 0.9
+        self.entropy_start = 0.5
+        self.entropy_end   = 0.01
+        self.decay_rate = 0.001
+
 
 
         #Initializing CNN (neural network of all states)
@@ -235,7 +235,9 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
         return
         
     def state_index_to_tensor(self,env,state_index):
-        x,y,avail_mask = env.unwrapped.to_cell[state_index]
+        cell = env.unwrapped.to_cell[state_index]
+        x, y = cell[0], cell[1]
+
         
         # print(f'START [DEBUG]')
         # print(f' x type: {x}')
@@ -255,7 +257,9 @@ class ThinIcePPOAgent(ThinIceTrainingAgent):
                 tensor[tile_type,j,i] = 1.0
 
         visited_channel = self.tile_types  # the extra channel index
-        for (vx, vy) in env.unwrapped.visited_tiles:
+        print(env.unwrapped.visited_tiles)
+        for tile in env.unwrapped.visited_tiles:
+            vx, vy = tile[0], tile[1]
             tensor[visited_channel, vy, vx] = 1.0
         
         #player position in last channel

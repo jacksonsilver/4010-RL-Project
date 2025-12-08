@@ -130,6 +130,7 @@ class ThinIceEnv(gym.Env):
 
 
     def step(self, action):
+        all_tiles_covered = False
         # Perform action
         target_reached = self.level.perform_action(ti.PlayerActions(action))
 
@@ -146,18 +147,25 @@ class ThinIceEnv(gym.Env):
 
         visited_info = player_position + (player_tile.tile_type.value,)
         if target_reached:
-            reward = 50
+            all_tiles_covered =( (len(self.visited_tiles)+1) == self.level.n_visitable_tiles )
+            if all_tiles_covered:
+                reward += 25
+            reward += 10
+
         elif player_tile.tile_type == ti.LevelTileType.WATER:
             # If player lands on water tile, end episode and give deinfluencing reward
             reward = -1
             terminated = True
         elif (visited_info not in self.visited_tiles):
             # If player is visiting a new tile, give a reward of 1
-            reward = 1
+            reward += 1
             self.visited_tiles.add(visited_info)
         
         # Debug information
-        info = {}
+        info = {
+            'all_tiles_covered':all_tiles_covered,
+            'target_reached': target_reached
+        }
 
         if self.render_mode == "human":
             print(f"Action taken: {ti.PlayerActions(action)}")
@@ -280,6 +288,15 @@ class ThinIceEnv(gym.Env):
             if ((action_mask >> (len(ti.PlayerActions) -1 - action.value)) & 1):
                 available_actions.append(action.value)
         return available_actions
+    
+    def get_actions_boolean_list(self,available_actions):
+        boolean_mask = [False] * self.n_actions
+        
+        for action in available_actions:
+            if 0 <= action < self.n_actions: 
+                boolean_mask[action] = True
+        
+        return boolean_mask
 
 
 # Run to test the environment

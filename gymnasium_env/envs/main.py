@@ -23,33 +23,33 @@ def all_levels(gamma,learning_rate):
     worked with reward +1 and FINLA REWARD OF -1 
     entrop = 0.1
     '''
-    for i in range(1,4):
-        print(f'Currently On Level {i}')
-        PPO(gamma,learning_rate,20,i,train = True,saveToLog=True)  #train
-        PPO(gamma,learning_rate,20,i,train = False)  #deploy
+    # for i in range(1,4):
+    #     print(f'Currently On Level {i}')
+    #     PPO(gamma,learning_rate,20,i,train = True,saveToLog=False)  #train
+    #     PPO(gamma,learning_rate,20,i,train = False)  #deploy
     
 
     #4,5
     for i in range(4,6):
         print(f'Currently On Level {i}')
-        PPO(gamma,learning_rate,800,i,train = True,saveToLog=True)  #train
+        PPO(gamma,learning_rate,800,i,train = True,saveToLog=False)  #train
         PPO(gamma,learning_rate,700,i,train = False)  #deploy
 
     #6,7,8,9
     for i in range(6,10):
         print(f'Currently On Level {i}')
-        PPO(gamma,learning_rate,950,i,train = True,saveToLog=True)  #train
+        PPO(gamma,learning_rate,950,i,train = True,saveToLog=False)  #train
         PPO(gamma,learning_rate,950,i,train = False)  #deploy
 
     #10,11
     for i in range(10,12):
         print(f'Currently On Level {i}')
-        PPO(gamma,learning_rate,1000,i,train = True,saveToLog=True)  #train
+        PPO(gamma,learning_rate,1000,i,train = True,saveToLog=False)  #train
         PPO(gamma,learning_rate,1000,i,train = False)  #deploy
 
 
 def PPO(gamma,lr,n_episodes,level_number,train,saveToLog  = False):
-    agent = ThinIcePPOAgent('thin-ice-v0', f'level_{level_number}.txt')
+    agent = ThinIcePPOAgent('thin-ice-v1', f'level_{level_number}.txt')
 
     if train:
         if saveToLog:
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     #
 
     step_size = 0.1
-    gamma = 1
+    gamma = 0.9
     epsilon = 0.1
     learning_rate = 0.0003
 
@@ -83,12 +83,12 @@ if __name__ == '__main__':
     level_number = 5
 
     #PPO(gamma,learning_rate,n_episodes,level_number,train = True,saveToLog=True)  #train
-    PPO(gamma,learning_rate,5,level_number,train = False)  #deploy
+    #PPO(gamma,learning_rate,5,level_number,train = False)  #deploy
     
     '''Algorithms currently implemented'''
 
     #QLearning(n_episodes,step_size,gamma,epsilon,level_number,train = True)
     #QLearning(n_episodes,step_size,gamma,epsilon,level_number,train = False)
 
-    #all_levels(gamma,learning_rate)
+    all_levels(gamma,learning_rate)
 
